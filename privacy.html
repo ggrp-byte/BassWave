@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Privacy Policy — BassWave</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: #000;
+      color: #fff;
+      font-family: -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", sans-serif;
+      font-size: 15px;
+      line-height: 1.7;
+    }
+    a { color: rgba(255,255,255,.6); text-decoration: underline; }
+    a:hover { color: #fff; }
+    nav {
+      padding: 20px 40px;
+      border-bottom: 1px solid rgba(255,255,255,.08);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .nav-logo { font-size: 15px; font-weight: 700; text-decoration: none; color: #fff; }
+    .back { font-size: 13px; color: rgba(255,255,255,.45); text-decoration: none; }
+    .back:hover { color: #fff; }
+    .container { max-width: 680px; margin: 0 auto; padding: 60px 20px 80px; }
+    .meta { font-size: 12px; color: rgba(255,255,255,.35); margin-bottom: 40px; }
+    h1 { font-size: 32px; font-weight: 800; letter-spacing: -1px; margin-bottom: 8px; }
+    h2 { font-size: 18px; font-weight: 700; margin-top: 36px; margin-bottom: 10px; }
+    p { color: rgba(255,255,255,.7); margin-bottom: 14px; }
+    ul { color: rgba(255,255,255,.7); padding-left: 20px; margin-bottom: 14px; }
+    li { margin-bottom: 6px; }
+    footer {
+      border-top: 1px solid rgba(255,255,255,.08);
+      padding: 24px 40px;
+      font-size: 12px;
+      color: rgba(255,255,255,.35);
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <a class="nav-logo" href="index.html">BassWave</a>
+  <a class="back" href="index.html">← Back to home</a>
+</nav>
+
+<div class="container">
+  <h1>Privacy Policy</h1>
+  <div class="meta">Last updated: June 2025</div>
+
+  <p>BassWave ("the extension", "we", "us") is a Chrome browser extension that boosts the bass of audio playing in Chrome tabs. This Privacy Policy explains what data we collect, how we use it, and your rights.</p>
+
+  <h2>1. Data we do NOT collect</h2>
+  <p>BassWave does not collect, transmit, or store:</p>
+  <ul>
+    <li>Audio content from your browser tabs</li>
+    <li>Browsing history or URLs you visit</li>
+    <li>Personal information (name, email, location)</li>
+    <li>Microphone audio</li>
+    <li>Cookies or tracking identifiers</li>
+  </ul>
+
+  <h2>2. Data stored locally on your device</h2>
+  <p>BassWave saves the following data locally in your browser using <code>chrome.storage.local</code>. This data never leaves your device and is not accessible to us:</p>
+  <ul>
+    <li><strong>Your last-used preset</strong> (e.g. "Medium") — so the extension remembers your preference between sessions</li>
+    <li><strong>Your last-used gain value</strong> (a number between 1 and 30)</li>
+    <li><strong>Pro license status</strong> — a boolean flag indicating whether you have unlocked the Pro tier</li>
+  </ul>
+
+  <h2>3. Payments (Pro tier)</h2>
+  <p>If you purchase a Pro license, payment is processed by <strong>ExtensionPay</strong> (powered by Stripe). Payment processing is handled entirely by these third-party services — BassWave does not receive or store your payment card details. Please review <a href="https://extensionpay.com/privacy" target="_blank">ExtensionPay's Privacy Policy</a> and <a href="https://stripe.com/privacy" target="_blank">Stripe's Privacy Policy</a> for information on how they handle your data.</p>
+
+  <h2>4. Permissions used</h2>
+  <p>BassWave requests the following Chrome permissions and uses them only as described:</p>
+  <ul>
+    <li><strong>tabCapture</strong> — captures the audio stream of the active tab so it can be processed by the Web Audio API. Audio is processed locally and never transmitted.</li>
+    <li><strong>storage</strong> — saves your preferences (preset, gain) locally on your device.</li>
+    <li><strong>tabs</strong> — reads the current tab's title and favicon to display in the popup. No tab content is accessed.</li>
+    <li><strong>offscreen</strong> — creates a hidden document to run the Web Audio API graph (required by Chrome's Manifest V3 architecture).</li>
+  </ul>
+
+  <h2>5. Third-party services</h2>
+  <p>The extension does not embed any third-party analytics, advertising, or tracking scripts. The only external service contacted is ExtensionPay (for Pro license verification), and only when you initiate a payment or the extension checks your license status.</p>
+
+  <h2>6. Children's privacy</h2>
+  <p>BassWave is not directed at children under 13. We do not knowingly collect any personal data from children.</p>
+
+  <h2>7. Changes to this policy</h2>
+  <p>We may update this Privacy Policy from time to time. The "Last updated" date at the top of this page will reflect any changes. Continued use of the extension after changes constitutes acceptance of the updated policy.</p>
+
+  <h2>8. Contact</h2>
+  <p>If you have questions about this Privacy Policy, contact us at: <a href="mailto:contact@basswave.app">contact@basswave.app</a></p>
+</div>
+
+<footer>© 2025 BassWave. All rights reserved.</footer>
+
+</body>
+</html>

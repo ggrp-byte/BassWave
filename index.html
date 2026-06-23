@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>BassWave — Audio Booster for Chrome</title>
+  <meta name="description" content="BassWave boosts bass on any Chrome tab. Deep bass, no distortion, one click.">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #000;
+      --text: #fff;
+      --muted: rgba(255,255,255,.45);
+      --border: rgba(255,255,255,.08);
+      --border-h: rgba(255,255,255,.16);
+      --card: rgba(255,255,255,.03);
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", sans-serif;
+      font-size: 15px;
+      line-height: 1.6;
+      background-image: radial-gradient(circle, rgba(255,255,255,.05) 1px, transparent 1px);
+      background-size: 24px 24px;
+    }
+
+    a { color: inherit; text-decoration: none; }
+
+    /* ── NAV ── */
+    nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 20px 40px;
+      border-bottom: 1px solid var(--border);
+      position: sticky;
+      top: 0;
+      background: rgba(0,0,0,.85);
+      backdrop-filter: blur(12px);
+      z-index: 100;
+    }
+    .nav-logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 16px;
+      font-weight: 700;
+      letter-spacing: -.4px;
+    }
+    .nav-logo svg { width: 28px; height: 28px; }
+    .nav-links { display: flex; gap: 28px; }
+    .nav-links a { color: var(--muted); font-size: 13px; transition: color .15s; }
+    .nav-links a:hover { color: var(--text); }
+    .nav-cta {
+      background: var(--text);
+      color: var(--bg);
+      padding: 8px 18px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 700;
+      transition: opacity .15s;
+    }
+    .nav-cta:hover { opacity: .85; }
+
+    /* ── HERO ── */
+    .hero {
+      text-align: center;
+      padding: 100px 20px 80px;
+      max-width: 680px;
+      margin: 0 auto;
+    }
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      border: 1px solid var(--border-h);
+      border-radius: 99px;
+      padding: 4px 14px;
+      font-size: 12px;
+      color: var(--muted);
+      margin-bottom: 28px;
+    }
+    .hero-badge span { width: 6px; height: 6px; border-radius: 50%; background: #22c55e; display: inline-block; }
+    h1 {
+      font-size: clamp(38px, 6vw, 60px);
+      font-weight: 800;
+      letter-spacing: -1.5px;
+      line-height: 1.08;
+      margin-bottom: 22px;
+    }
+    h1 em { font-style: normal; color: var(--muted); }
+    .hero-sub {
+      font-size: 17px;
+      color: var(--muted);
+      line-height: 1.6;
+      margin-bottom: 38px;
+      max-width: 480px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    .hero-btns { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+    .btn-primary {
+      background: var(--text);
+      color: var(--bg);
+      padding: 13px 28px;
+      border-radius: 10px;
+      font-size: 14px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: opacity .15s;
+    }
+    .btn-primary:hover { opacity: .88; }
+    .btn-secondary {
+      border: 1px solid var(--border-h);
+      color: var(--muted);
+      padding: 13px 28px;
+      border-radius: 10px;
+      font-size: 14px;
+      font-weight: 500;
+      transition: border-color .15s, color .15s;
+    }
+    .btn-secondary:hover { border-color: rgba(255,255,255,.35); color: var(--text); }
+
+    /* ── POPUP PREVIEW ── */
+    .preview-wrap {
+      max-width: 380px;
+      margin: 60px auto 0;
+      border: 1px solid var(--border-h);
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 0 80px rgba(255,255,255,.04), 0 0 0 1px rgba(255,255,255,.06);
+    }
+    .preview-bar {
+      background: rgba(255,255,255,.04);
+      border-bottom: 1px solid var(--border);
+      padding: 10px 16px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .preview-dot { width: 10px; height: 10px; border-radius: 50%; background: rgba(255,255,255,.15); }
+    .preview-dot:first-child { background: #ef4444; }
+    .preview-dot:nth-child(2) { background: #f59e0b; }
+    .preview-dot:nth-child(3) { background: #22c55e; }
+    .preview-body {
+      padding: 24px;
+      background: #0a0a0a;
+    }
+    .preview-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+    .preview-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 9px;
+      background: #111;
+      border: 1px solid var(--border-h);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .preview-icon svg { width: 20px; height: 20px; }
+    .preview-title { font-size: 15px; font-weight: 700; }
+    .preview-sub { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: .5px; }
+
+    .preview-power {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 16px;
+      border: 1px solid rgba(255,255,255,.12);
+      border-radius: 12px;
+      margin-bottom: 16px;
+      background: rgba(255,255,255,.02);
+    }
+    .pwr-ring {
+      width: 48px; height: 48px;
+      border-radius: 50%;
+      border: 1.5px solid rgba(255,255,255,.6);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 0 16px rgba(255,255,255,.08);
+      flex-shrink: 0;
+    }
+    .pwr-ring svg { width: 20px; height: 20px; }
+    .preview-on { font-size: 14px; font-weight: 700; }
+    .preview-on-sub { font-size: 11px; color: var(--muted); }
+
+    .preview-chips {
+      display: flex;
+      gap: 6px;
+      margin-bottom: 14px;
+    }
+    .chip {
+      padding: 4px 12px;
+      border-radius: 6px;
+      border: 1px solid var(--border-h);
+      font-size: 11px;
+      color: var(--muted);
+    }
+    .chip.active {
+      background: rgba(255,255,255,.07);
+      border-color: rgba(255,255,255,.4);
+      color: var(--text);
+      font-weight: 600;
+    }
+
+    .preview-slider-row { display: flex; align-items: center; gap: 10px; }
+    .preview-slider {
+      flex: 1;
+      height: 3px;
+      border-radius: 3px;
+      background: linear-gradient(to right, rgba(255,255,255,.7) 0%, rgba(255,255,255,.7) 55%, rgba(255,255,255,.1) 55%, rgba(255,255,255,.1) 100%);
+      position: relative;
+    }
+    .preview-thumb {
+      position: absolute;
+      left: calc(55% - 7px);
+      top: -5px;
+      width: 13px; height: 13px;
+      border-radius: 50%;
+      background: #fff;
+    }
+    .preview-db { font-size: 11px; font-weight: 700; width: 40px; text-align: right; }
+
+    /* ── FEATURES ── */
+    section { padding: 80px 20px; }
+    .section-inner { max-width: 1000px; margin: 0 auto; }
+    .section-label {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 12px;
+    }
+    .section-title {
+      font-size: clamp(28px, 4vw, 42px);
+      font-weight: 800;
+      letter-spacing: -1px;
+      margin-bottom: 50px;
+      line-height: 1.1;
+    }
+    .features {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 16px;
+    }
+    .feature-card {
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 26px;
+      background: var(--card);
+      transition: border-color .2s, background .2s;
+    }
+    .feature-card:hover {
+      border-color: var(--border-h);
+      background: rgba(255,255,255,.05);
+    }
+    .feature-icon {
+      font-size: 24px;
+      margin-bottom: 14px;
+      display: block;
+    }
+    .feature-card h3 { font-size: 15px; font-weight: 700; margin-bottom: 8px; }
+    .feature-card p { font-size: 13px; color: var(--muted); line-height: 1.55; }
+
+    /* ── HOW IT WORKS ── */
+    .steps { display: flex; flex-direction: column; gap: 0; max-width: 560px; }
+    .step { display: flex; gap: 20px; padding-bottom: 32px; position: relative; }
+    .step:not(:last-child)::before {
+      content: "";
+      position: absolute;
+      left: 17px;
+      top: 38px;
+      bottom: 0;
+      width: 1px;
+      background: var(--border);
+    }
+    .step-num {
+      width: 36px; height: 36px;
+      border-radius: 50%;
+      border: 1px solid var(--border-h);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      font-weight: 700;
+      flex-shrink: 0;
+      background: var(--bg);
+    }
+    .step-body h3 { font-size: 15px; font-weight: 700; margin-bottom: 4px; padding-top: 5px; }
+    .step-body p { font-size: 13px; color: var(--muted); line-height: 1.55; }
+
+    /* ── CTA BAND ── */
+    .cta-band {
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+      padding: 80px 20px;
+      text-align: center;
+      background: linear-gradient(180deg, rgba(255,255,255,.015) 0%, transparent 100%);
+    }
+    .cta-band h2 { font-size: clamp(28px, 4vw, 44px); font-weight: 800; letter-spacing: -1px; margin-bottom: 16px; }
+    .cta-band p { color: var(--muted); margin-bottom: 32px; font-size: 16px; }
+
+    /* ── FOOTER ── */
+    footer {
+      padding: 32px 40px;
+      border-top: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+    .footer-logo { font-size: 14px; font-weight: 700; letter-spacing: -.3px; }
+    .footer-links { display: flex; gap: 24px; }
+    .footer-links a { font-size: 12px; color: var(--muted); transition: color .15s; }
+    .footer-links a:hover { color: var(--text); }
+    .footer-copy { font-size: 12px; color: var(--muted); }
+
+    @media (max-width: 600px) {
+      nav { padding: 16px 20px; }
+      .nav-links { display: none; }
+      footer { padding: 24px 20px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo">
+    <svg viewBox="0 0 28 28" fill="none">
+      <rect width="28" height="28" rx="7" fill="#111"/>
+      <rect x="3"  y="16" width="3" height="9"  rx="1.5" fill="white" opacity=".5"/>
+      <rect x="8"  y="11" width="3" height="14" rx="1.5" fill="white" opacity=".7"/>
+      <rect x="13" y="6"  width="3" height="19" rx="1.5" fill="white"/>
+      <rect x="18" y="9"  width="3" height="16" rx="1.5" fill="white" opacity=".7"/>
+      <rect x="23" y="14" width="3" height="11" rx="1.5" fill="white" opacity=".5"/>
+    </svg>
+    BassWave
+  </div>
+  <div class="nav-links">
+    <a href="#features">Features</a>
+    <a href="#how">How it works</a>
+    <a href="privacy.html">Privacy</a>
+    <a href="terms.html">Terms</a>
+  </div>
+  <a class="nav-cta" href="https://chromewebstore.google.com/detail/basswave" target="_blank">
+    Add to Chrome — Free
+  </a>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-badge"><span></span> Available on Chrome Web Store</div>
+  <h1>Deep bass.<br><em>Zero distortion.</em></h1>
+  <p class="hero-sub">
+    BassWave boosts the low end on any Chrome tab — music, video, podcasts —
+    using a professional audio chain that eliminates harsh clipping at high volumes.
+  </p>
+  <div class="hero-btns">
+    <a class="btn-primary" href="https://chromewebstore.google.com/detail/basswave" target="_blank">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z"/><path d="M8 12l4-4 4 4M12 8v8"/></svg>
+      Add to Chrome — Free
+    </a>
+    <a class="btn-secondary" href="#features">See features</a>
+  </div>
+
+  <!-- fake popup preview -->
+  <div class="preview-wrap">
+    <div class="preview-bar">
+      <div class="preview-dot"></div>
+      <div class="preview-dot"></div>
+      <div class="preview-dot"></div>
+    </div>
+    <div class="preview-body">
+      <div class="preview-header">
+        <div class="preview-icon">
+          <svg viewBox="0 0 20 20" fill="none">
+            <rect x="1"  y="11" width="2.5" height="8"  rx="1.25" fill="white" opacity=".5"/>
+            <rect x="5"  y="7"  width="2.5" height="12" rx="1.25" fill="white" opacity=".7"/>
+            <rect x="9"  y="3"  width="2.5" height="16" rx="1.25" fill="white"/>
+            <rect x="13" y="6"  width="2.5" height="13" rx="1.25" fill="white" opacity=".7"/>
+            <rect x="17" y="10" width="2.5" height="9"  rx="1.25" fill="white" opacity=".5"/>
+          </svg>
+        </div>
+        <div>
+          <div class="preview-title">BassWave</div>
+          <div class="preview-sub">Audio Booster</div>
+        </div>
+      </div>
+
+      <div class="preview-power">
+        <div class="pwr-ring">
+          <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round">
+            <circle cx="12" cy="12" r="3" fill="white"/>
+            <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/>
+          </svg>
+        </div>
+        <div>
+          <div class="preview-on">Włączony</div>
+          <div class="preview-on-sub">Bas jest wzmacniany na tej karcie</div>
+        </div>
+      </div>
+
+      <div style="font-size:9px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:rgba(255,255,255,.38);margin-bottom:8px;">Preset</div>
+      <div class="preview-chips" style="margin-bottom:14px;">
+        <div class="chip">Soft</div>
+        <div class="chip active">Medium</div>
+        <div class="chip">Strong</div>
+        <div class="chip" style="opacity:.4;">Chipmunks</div>
+      </div>
+
+      <div style="font-size:9px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:rgba(255,255,255,.38);margin-bottom:8px;">Bass Gain</div>
+      <div class="preview-slider-row">
+        <div class="preview-slider"><div class="preview-thumb"></div></div>
+        <div class="preview-db">+14 dB</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- FEATURES -->
+<section id="features">
+  <div class="section-inner">
+    <div class="section-label">Features</div>
+    <div class="section-title">Built for people<br>who feel music.</div>
+    <div class="features">
+      <div class="feature-card">
+        <span class="feature-icon">🎚️</span>
+        <h3>Professional EQ chain</h3>
+        <p>Three-stage audio processing: bass shelf boost, vocal-mid sculpting, and a transparent peak limiter — the same approach used in studio mastering.</p>
+      </div>
+      <div class="feature-card">
+        <span class="feature-icon">🔊</span>
+        <h3>Smooth peaks, no clipping</h3>
+        <p>A soft-clip WaveShaper rounds off peak spikes instead of slicing them flat. High volume stays punchy without the harsh crackle.</p>
+      </div>
+      <div class="feature-card">
+        <span class="feature-icon">⚡</span>
+        <h3>Any tab, one click</h3>
+        <p>Works on YouTube, Spotify Web, SoundCloud, Netflix, Twitch — any Chrome tab with audio. No page reload needed.</p>
+      </div>
+      <div class="feature-card">
+        <span class="feature-icon">🎛️</span>
+        <h3>Presets + manual gain</h3>
+        <p>Soft, Medium, Strong presets cover most situations. Or drag the slider from +1 to +30 dB and set it exactly where you want it.</p>
+      </div>
+      <div class="feature-card">
+        <span class="feature-icon">⌨️</span>
+        <h3>Keyboard shortcut</h3>
+        <p>Toggle bass boost with Ctrl+Shift+B without ever opening the popup. Your settings are remembered across sessions.</p>
+      </div>
+      <div class="feature-card">
+        <span class="feature-icon">🔒</span>
+        <h3>Zero data collection</h3>
+        <p>BassWave processes audio locally in your browser. No microphone access, no analytics, no accounts required for the free version.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section id="how" style="padding-top:0;">
+  <div class="section-inner">
+    <div class="section-label">How it works</div>
+    <div class="section-title">Up and running<br>in 30 seconds.</div>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-body">
+          <h3>Install from Chrome Web Store</h3>
+          <p>Click "Add to Chrome" — no account required, free to install. The BassWave icon appears in your toolbar.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-body">
+          <h3>Open any tab with audio</h3>
+          <p>Navigate to YouTube, Spotify, Netflix, or any other site. Start playing something.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-body">
+          <h3>Click the BassWave icon</h3>
+          <p>Hit the power button. Bass is boosted instantly — adjust the preset and gain to taste. That's it.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA BAND -->
+<div class="cta-band">
+  <h2>Start listening differently.</h2>
+  <p>Free to install. No account. No tracking.</p>
+  <a class="btn-primary" style="display:inline-flex;" href="https://chromewebstore.google.com/detail/basswave" target="_blank">
+    Add to Chrome — Free
+  </a>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-logo">BassWave</div>
+  <div class="footer-links">
+    <a href="privacy.html">Privacy Policy</a>
+    <a href="terms.html">Terms of Service</a>
+    <a href="mailto:contact@basswave.app">Contact</a>
+  </div>
+  <div class="footer-copy">© 2025 BassWave. All rights reserved.</div>
+</footer>
+
+</body>
+</html>
