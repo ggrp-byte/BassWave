@@ -335,6 +335,14 @@
       .nav-links { display: none; }
       footer { padding: 24px 20px; }
     }
+  
+    .lang-switcher { display: flex; gap: 4px; }
+    .lang-btn {
+      background: none; border: 1px solid var(--border); border-radius: 5px;
+      color: var(--muted); font-size: 11px; font-weight: 600; padding: 4px 7px;
+      cursor: pointer; transition: border-color .15s, color .15s;
+    }
+    .lang-btn:hover, .lang-btn.active { border-color: var(--border-h); color: var(--text); }
   </style>
 </head>
 <body>
@@ -358,7 +366,8 @@
     <a href="privacy.html">Privacy</a>
     <a href="terms.html">Terms</a>
   </div>
-  <a class="nav-cta" href="https://chromewebstore.google.com/detail/basswave-audio-booster/dkemfignbandgplpcoaejidehadikdlf" target="_blank">
+  <div class="lang-switcher"><button class="lang-btn" data-lang="en">EN</button><button class="lang-btn" data-lang="pl">PL</button><button class="lang-btn" data-lang="de">DE</button><button class="lang-btn" data-lang="fr">FR</button><button class="lang-btn" data-lang="es">ES</button></div>
+    <a class="nav-cta" href="https://chromewebstore.google.com/detail/basswave" target="_blank">
     Add to Chrome — Free
   </a>
 </nav>
@@ -372,7 +381,7 @@
     using a professional audio chain that eliminates harsh clipping at high volumes.
   </p>
   <div class="hero-btns">
-    <a class="btn-primary" href="https://chromewebstore.google.com/detail/basswave-audio-booster/dkemfignbandgplpcoaejidehadikdlf" target="_blank">
+    <a class="btn-primary" href="https://chromewebstore.google.com/detail/basswave" target="_blank">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z"/><path d="M8 12l4-4 4 4M12 8v8"/></svg>
       Add to Chrome — Free
     </a>
@@ -508,7 +517,7 @@
 <div class="cta-band">
   <h2>Start listening differently.</h2>
   <p>Free to install. No account. No tracking.</p>
-  <a class="btn-primary" style="display:inline-flex;" href="https://chromewebstore.google.com/detail/basswave-audio-booster/dkemfignbandgplpcoaejidehadikdlf" target="_blank">
+  <a class="btn-primary" style="display:inline-flex;" href="https://chromewebstore.google.com/detail/basswave" target="_blank">
     Add to Chrome — Free
   </a>
 </div>
@@ -519,10 +528,90 @@
   <div class="footer-links">
     <a href="privacy.html">Privacy Policy</a>
     <a href="terms.html">Terms of Service</a>
-    <a href="mailto:contact@basswave.app">Contact</a>
+    <a href="refund.html">Refund Policy</a>
+    <a href="https://github.com/ggrp-byte/BassWave/issues" target="_blank">Contact</a>
   </div>
   <div class="footer-copy">© 2025 BassWave. All rights reserved.</div>
 </footer>
 
+
+  <script>
+  const TRANSLATIONS = {
+    en: {
+      hero: "Deep bass.<br><em>Zero distortion.</em>",
+      sub: "BassWave boosts the low end on any Chrome tab — music, video, podcasts — using a professional audio chain that eliminates harsh clipping at high volumes.",
+      cta: "Add to Chrome — Free",
+      badge: "Available on Chrome Web Store",
+      featTitle: "Built for people<br>who feel music.",
+      ctaTitle: "Start listening differently.",
+      ctaSub: "Free to install. No account. No tracking."
+    },
+    pl: {
+      hero: "Głęboki bas.<br><em>Zero przesterów.</em>",
+      sub: "BassWave wzmacnia dół pasma na dowolnej karcie Chrome — muzyka, wideo, podcasty — używając profesjonalnego łańcucha audio eliminującego przestery przy dużej głośności.",
+      cta: "Dodaj do Chrome — Za darmo",
+      badge: "Dostępne w Chrome Web Store",
+      featTitle: "Dla tych, którzy<br>czują muzykę.",
+      ctaTitle: "Zacznij słuchać inaczej.",
+      ctaSub: "Bezpłatna instalacja. Bez konta. Bez śledzenia."
+    },
+    de: {
+      hero: "Tiefer Bass.<br><em>Null Verzerrung.</em>",
+      sub: "BassWave verstärkt den Bassbereich auf jedem Chrome-Tab — Musik, Video, Podcasts — mit professioneller Audio-Verarbeitung ohne hartes Clipping.",
+      cta: "Zu Chrome hinzufügen — Kostenlos",
+      badge: "Im Chrome Web Store verfügbar",
+      featTitle: "Für Menschen, die<br>Musik fühlen.",
+      ctaTitle: "Anders zuhören.",
+      ctaSub: "Kostenlos. Kein Konto. Kein Tracking."
+    },
+    fr: {
+      hero: "Basses profondes.<br><em>Zéro distorsion.</em>",
+      sub: "BassWave booste les graves sur tout onglet Chrome — musique, vidéo, podcasts — avec un traitement audio pro sans écrêtage.",
+      cta: "Ajouter à Chrome — Gratuit",
+      badge: "Disponible sur le Chrome Web Store",
+      featTitle: "Pour ceux qui<br>ressentent la musique.",
+      ctaTitle: "Écoutez différemment.",
+      ctaSub: "Gratuit. Sans compte. Sans tracking."
+    },
+    es: {
+      hero: "Graves profundos.<br><em>Cero distorsión.</em>",
+      sub: "BassWave potencia los graves en cualquier pestaña de Chrome — música, vídeo, podcasts — con procesamiento de audio profesional sin clipping.",
+      cta: "Añadir a Chrome — Gratis",
+      badge: "Disponible en Chrome Web Store",
+      featTitle: "Para los que<br>sienten la música.",
+      ctaTitle: "Escucha de otra manera.",
+      ctaSub: "Gratis. Sin cuenta. Sin rastreo."
+    }
+  };
+
+  function applyLang(lang) {
+    const t = TRANSLATIONS[lang] || TRANSLATIONS.en;
+    const h1 = document.querySelector(".hero h1");
+    const sub = document.querySelector(".hero-sub");
+    const badge = document.querySelector(".hero-badge");
+    const ctaTitle = document.querySelector(".cta-band h2");
+    const ctaSub = document.querySelector(".cta-band p");
+    if (h1) h1.innerHTML = t.hero;
+    if (sub) sub.textContent = t.sub;
+    if (badge) badge.innerHTML = `<span></span> ${t.badge}`;
+    if (ctaTitle) ctaTitle.textContent = t.ctaTitle;
+    if (ctaSub) ctaSub.textContent = t.ctaSub;
+    document.querySelectorAll(".btn-primary").forEach(b => {
+      if (b.textContent.includes("Chrome")) b.innerHTML = b.innerHTML.replace(/Add to Chrome[^<]*/g, t.cta.replace(" — ", " — "));
+    });
+    document.querySelectorAll(".lang-btn").forEach(b => b.classList.toggle("active", b.dataset.lang === lang));
+    localStorage.setItem("bwLang", lang);
+  }
+
+  document.addEventListener("DOMContentLoaded", () => {
+    const saved = localStorage.getItem("bwLang");
+    const browser = (navigator.language || "en").slice(0, 2);
+    const lang = saved || (TRANSLATIONS[browser] ? browser : "en");
+    applyLang(lang);
+    document.querySelectorAll(".lang-btn").forEach(b => {
+      b.addEventListener("click", () => applyLang(b.dataset.lang));
+    });
+  });
+  </script>
 </body>
 </html>
