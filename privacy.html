@@ -4,95 +4,103 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Privacy Policy — BassWave</title>
+  <meta name="description" content="How BassWave handles tab audio, browser permissions, and locally stored settings.">
+  <meta name="theme-color" content="#05070b">
+  <link rel="icon" href="assets/basswave-store-icon.png">
   <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    body {
-      background: #000;
-      color: #fff;
-      font-family: -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", sans-serif;
-      font-size: 15px;
-      line-height: 1.7;
+    :root {
+      color-scheme: dark;
+      --bg: #05070b;
+      --surface: #0b0f17;
+      --text: #f7f9fc;
+      --muted: #9aa7b8;
+      --line: #202a38;
+      --accent: #72b7ff;
+      --max: 820px;
     }
-    a { color: rgba(255,255,255,.6); text-decoration: underline; }
-    a:hover { color: #fff; }
-    nav {
-      padding: 20px 40px;
-      border-bottom: 1px solid rgba(255,255,255,.08);
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-    .nav-logo { font-size: 15px; font-weight: 700; text-decoration: none; color: #fff; }
-    .back { font-size: 13px; color: rgba(255,255,255,.45); text-decoration: none; }
-    .back:hover { color: #fff; }
-    .container { max-width: 680px; margin: 0 auto; padding: 60px 20px 80px; }
-    .meta { font-size: 12px; color: rgba(255,255,255,.35); margin-bottom: 40px; }
-    h1 { font-size: 32px; font-weight: 800; letter-spacing: -1px; margin-bottom: 8px; }
-    h2 { font-size: 18px; font-weight: 700; margin-top: 36px; margin-bottom: 10px; }
-    p { color: rgba(255,255,255,.7); margin-bottom: 14px; }
-    ul { color: rgba(255,255,255,.7); padding-left: 20px; margin-bottom: 14px; }
-    li { margin-bottom: 6px; }
-    footer {
-      border-top: 1px solid rgba(255,255,255,.08);
-      padding: 24px 40px;
-      font-size: 12px;
-      color: rgba(255,255,255,.35);
-    }
+    * { box-sizing: border-box; }
+    body { margin: 0; background: var(--bg); color: var(--text); font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; line-height: 1.7; }
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    a:focus-visible { outline: 3px solid var(--accent); outline-offset: 4px; }
+    .wrap { width: min(var(--max), calc(100% - 40px)); margin-inline: auto; }
+    header { padding: 28px 0; border-bottom: 1px solid var(--line); }
+    .brand { display: inline-flex; align-items: center; gap: 11px; color: var(--text); font-size: 18px; font-weight: 750; letter-spacing: -.03em; }
+    .brand img { width: 30px; height: 30px; border-radius: 8px; }
+    main { padding: 72px 0 88px; }
+    .eyebrow { color: var(--accent); font-size: 12px; font-weight: 750; letter-spacing: .14em; text-transform: uppercase; }
+    h1 { margin: 12px 0 16px; font-size: clamp(42px, 7vw, 68px); line-height: 1; letter-spacing: -.055em; }
+    .updated { margin-bottom: 48px; color: var(--muted); font-size: 14px; }
+    .intro { padding: 22px 24px; border: 1px solid var(--line); border-left: 3px solid var(--accent); border-radius: 0 10px 10px 0; background: var(--surface); color: var(--muted); }
+    .intro strong { color: var(--text); }
+    h2 { margin: 44px 0 12px; font-size: 24px; letter-spacing: -.025em; }
+    p, ul { color: var(--muted); }
+    ul { padding-left: 22px; }
+    li { margin: 7px 0; }
+    code { padding: 2px 5px; border-radius: 4px; background: #111722; color: #c9d8e8; font-size: .9em; }
+    footer { padding: 26px 0; border-top: 1px solid var(--line); color: var(--muted); font-size: 13px; }
+    @media (max-width: 600px) { main { padding-top: 52px; } h2 { font-size: 21px; } }
   </style>
 </head>
 <body>
+  <header>
+    <div class="wrap">
+      <a class="brand" href="index.html">
+        <img src="assets/basswave-store-icon.png" alt="" width="30" height="30">
+        BassWave
+      </a>
+    </div>
+  </header>
 
-<nav>
-  <a class="nav-logo" href="index.html">BassWave</a>
-  <a class="back" href="index.html">← Back to home</a>
-</nav>
+  <main class="wrap">
+    <div class="eyebrow">Privacy</div>
+    <h1>Privacy Policy</h1>
+    <div class="updated">Last updated: November 24, 2026</div>
 
-<div class="container">
-  <h1>Privacy Policy</h1>
-  <div class="meta">Last updated: July 2025</div>
+    <div class="intro">
+      <strong>BassWave processes tab audio locally in your browser.</strong> It does not upload, record, sell, or share your audio. No account, analytics, advertising identifiers, or third-party tracking services are used.
+    </div>
 
-  <p>BassWave ("the extension", "we", "us") is a Chrome browser extension that boosts the bass of audio playing in Chrome tabs. This Privacy Policy explains what data we collect, how we use it, and your rights.</p>
+    <h2>What BassWave accesses</h2>
+    <p>When you explicitly enable BassWave for an eligible Chrome tab, the extension accesses that tab’s audio stream to apply bass gain, presets, compression, and soft clipping. It also reads the active tab’s title, favicon URL, and URL to show which tab you are controlling, block restricted pages, and stop processing after cross-origin navigation.</p>
+    <p>BassWave cannot capture Chrome Web Store pages, <code>chrome://</code> pages, <code>file://</code> pages, other restricted browser pages, or a tab whose audio is already being captured by another extension.</p>
 
-  <h2>1. Data we do NOT collect</h2>
-  <p>BassWave does not collect, transmit, or store:</p>
-  <ul>
-    <li>Audio content from your browser tabs</li>
-    <li>Browsing history or URLs you visit</li>
-    <li>Personal information (name, email, location)</li>
-    <li>Microphone audio</li>
-    <li>Cookies or tracking identifiers</li>
-  </ul>
+    <h2>How information is used</h2>
+    <ul>
+      <li>Tab audio is used only to provide the bass-processing effect you request and play the processed audio back to you.</li>
+      <li>The tab title and site favicon are displayed in the popup so you can confirm which tab you are controlling.</li>
+      <li>The tab URL is checked for restricted-page handling and navigation cleanup. It is not used for advertising, profiling, or analytics.</li>
+    </ul>
 
-  <h2>2. Data stored locally on your device</h2>
-  <p>BassWave saves the following data locally in your browser using <code>chrome.storage.local</code>. This data never leaves your device and is not accessible to us:</p>
-  <ul>
-    <li><strong>Your last-used preset</strong> (e.g. "Medium") — so the extension remembers your preference between sessions</li>
-    <li><strong>Your last-used gain value</strong> (a number between 0 and 30)</li>
-  </ul>
+    <h2>What is stored</h2>
+    <p>BassWave stores the following information locally in your Chrome profile:</p>
+    <ul>
+      <li>Your consent to local audio processing.</li>
+      <li>Your last-used preset, bass gain, Smooth Peaks preference, and sound-engine choice in <code>chrome.storage.local</code>.</li>
+      <li>Per-tab processing status, URL, generation token, and last error in <code>chrome.storage.session</code>. Session data is cleared when the browser session ends.</li>
+    </ul>
+    <p>Audio is not written to disk, stored in extension storage, or retained after processing stops.</p>
 
-  <h2>3. Permissions used</h2>
-  <p>BassWave requests the following Chrome permissions and uses them only as described:</p>
-  <ul>
-    <li><strong>tabCapture</strong> — captures the audio stream of the active tab so it can be processed by the Web Audio API. Audio is processed locally and never transmitted.</li>
-    <li><strong>storage</strong> — saves your preferences (preset, gain) locally on your device.</li>
-    <li><strong>tabs</strong> — reads the current tab's title and favicon to display in the popup. No tab content is accessed.</li>
-    <li><strong>offscreen</strong> — creates a hidden document to run the Web Audio API graph (required by Chrome's Manifest V3 architecture).</li>
-  </ul>
+    <h2>Data sharing and third parties</h2>
+    <p>BassWave does not transmit tab audio, URLs, titles, favicons, settings, or usage data off your device. It does not use cookies, analytics, telemetry, remote code, advertising services, or third-party APIs. The extension does not sell data or use it for creditworthiness, lending, profiling, or unrelated purposes.</p>
 
-  <h2>4. Third-party services</h2>
-  <p>The extension does not embed any third-party analytics, advertising, or tracking scripts. BassWave is completely free and does not require an account or any external service.</p>
+    <h2>Your choices and controls</h2>
+    <p>You choose when to enable processing for a tab. Turn BassWave off, close the tab, or navigate to another origin to stop processing. Removing the extension removes its locally stored settings and consent. You can also clear site data for the extension through Chrome’s extension settings.</p>
 
-  <h2>5. Children's privacy</h2>
-  <p>BassWave is not directed at children under 13. We do not knowingly collect any personal data from children.</p>
+    <h2>Data retention and deletion</h2>
+    <p>Preset, gain, Smooth Peaks, sound-engine, and consent preferences remain in local extension storage until you remove the extension or clear its data. Active-tab session state lasts only for the current browser session. Audio exists only in the live browser audio pipeline while processing is active.</p>
 
-  <h2>6. Changes to this policy</h2>
-  <p>We may update this Privacy Policy from time to time. The "Last updated" date at the top of this page will reflect any changes. Continued use of the extension after changes constitutes acceptance of the updated policy.</p>
+    <h2>Changes to this policy</h2>
+    <p>If BassWave’s data practices change, this policy will be updated and the revision date will change. Material changes will be communicated through the product website or Chrome Web Store listing before they take effect.</p>
 
-  <h2>7. Contact</h2>
-  <p>If you have questions about this Privacy Policy, contact us at: <a href="https://github.com/ggrp-byte/BassWave/issues" target="_blank">GitHub Issues</a></p>
-</div>
+    <h2>Contact</h2>
+    <p>For privacy questions or support, open an issue at <a href="https://github.com/ggrp-byte/BassWave/issues" target="_blank" rel="noopener noreferrer">github.com/ggrp-byte/BassWave/issues</a>.</p>
+  </main>
 
-<footer>© 2025 BassWave. All rights reserved.</footer>
-
+  <footer>
+    <div class="wrap">
+      <a href="index.html">Home</a> · <a href="terms.html">Terms</a> · <a href="refund.html">Refund</a> · <a href="https://chromewebstore.google.com/detail/basswave/dkemfignbandgplpcoaejidehadikdlf" target="_blank" rel="noopener noreferrer">Chrome Web Store</a>
+    </div>
+  </footer>
 </body>
 </html>

@@ -3,917 +3,336 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>BassWave — Audio Booster for Chrome</title>
-  <meta name="description" content="BassWave boosts bass on any Chrome tab. Deep bass, no distortion, one click. ⚠️ Adjust system + player volume to avoid clipping.">
+  <title>BassWave: Bass Booster Extension for Chrome</title>
+  <meta name="description" content="Shape bass on eligible Chrome tabs with five presets, a 0–30 dB slider, Smooth Peaks, and switchable 2.2/2.1 sound. Processed locally.">
+  <meta property="og:title" content="BassWave — Take control of the low end">
+  <meta property="og:description" content="Five presets, 0–30 dB gain, Smooth Peaks, a 2.1 Classic engine option, and local audio processing for eligible Chrome tabs.">
+  <meta property="og:type" content="website">
+  <meta property="og:image" content="https://ggrp-byte.github.io/BassWave/assets/basswave-store-screenshot-2.2.png">
+  <meta property="og:image:width" content="1280">
+  <meta property="og:image:height" content="800">
+  <meta property="og:url" content="https://ggrp-byte.github.io/BassWave/">
+  <meta name="theme-color" content="#05070b">
+  <link rel="icon" href="assets/basswave-store-icon.png">
   <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
     :root {
-      --bg: #000;
-      --text: #fff;
-      --muted: rgba(255,255,255,.45);
-      --border: rgba(255,255,255,.08);
-      --border-h: rgba(255,255,255,.16);
-      --card: rgba(255,255,255,.03);
+      color-scheme: dark;
+      --bg: #05070b;
+      --surface: #0b0f17;
+      --surface-2: #101722;
+      --text: #f7f9fc;
+      --muted: #9aa7b8;
+      --line: #202a38;
+      --accent: #72b7ff;
+      --accent-strong: #2e8cff;
+      --on: #55d68b;
+      --max: 1160px;
     }
-
+    * { box-sizing: border-box; }
     html { scroll-behavior: smooth; }
-
     body {
+      margin: 0;
       background: var(--bg);
       color: var(--text);
-      font-family: -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", sans-serif;
-      font-size: 15px;
+      font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
       line-height: 1.6;
-      background-image: radial-gradient(circle, rgba(255,255,255,.05) 1px, transparent 1px);
-      background-size: 24px 24px;
+      -webkit-font-smoothing: antialiased;
     }
-
     a { color: inherit; text-decoration: none; }
-
-    /* ── NAV ── */
-    nav {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 20px 40px;
-      border-bottom: 1px solid var(--border);
+    button, a { -webkit-tap-highlight-color: transparent; }
+    :focus-visible { outline: 3px solid var(--accent); outline-offset: 4px; }
+    .wrap { width: min(var(--max), calc(100% - 48px)); margin-inline: auto; }
+    .nav {
       position: sticky;
       top: 0;
-      background: rgba(0,0,0,.85);
-      backdrop-filter: blur(12px);
-      z-index: 100;
+      z-index: 20;
+      border-bottom: 1px solid rgba(255,255,255,.08);
+      background: rgba(5,7,11,.88);
+      backdrop-filter: blur(18px);
     }
-    .nav-logo {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      font-size: 16px;
-      font-weight: 700;
-      letter-spacing: -.4px;
-    }
-    .nav-logo svg { width: 28px; height: 28px; }
-    .nav-links { display: flex; gap: 28px; }
-    .nav-links a { color: var(--muted); font-size: 13px; transition: color .15s; }
+    .nav-inner { min-height: 72px; display: flex; align-items: center; justify-content: space-between; gap: 24px; }
+    .brand { display: inline-flex; align-items: center; gap: 11px; font-weight: 760; letter-spacing: -.03em; font-size: 18px; }
+    .brand img { width: 30px; height: 30px; border-radius: 8px; }
+    .nav-links { display: flex; align-items: center; gap: 30px; color: var(--muted); font-size: 14px; }
     .nav-links a:hover { color: var(--text); }
-    .nav-cta {
-      background: var(--text);
-      color: var(--bg);
-      padding: 8px 18px;
-      border-radius: 8px;
-      font-size: 13px;
-      font-weight: 700;
-      transition: opacity .15s;
-    }
-    .nav-cta:hover { opacity: .88; }
-
-    /* ── HERO ── */
-    .hero {
-      text-align: center;
-      padding: 100px 20px 80px;
-      max-width: 680px;
-      margin: 0 auto;
-    }
-    .hero-badge {
+    .button {
       display: inline-flex;
       align-items: center;
-      gap: 6px;
-      border: 1px solid var(--border-h);
-      border-radius: 99px;
-      padding: 4px 14px;
-      font-size: 12px;
-      color: var(--muted);
-      margin-bottom: 28px;
-    }
-    .hero-badge span { width: 6px; height: 6px; border-radius: 50%; background: #22c55e; display: inline-block; }
-    h1 {
-      font-size: clamp(38px, 6vw, 60px);
-      font-weight: 800;
-      letter-spacing: -1.5px;
-      line-height: 1.08;
-      margin-bottom: 22px;
-    }
-    h1 em { font-style: normal; color: var(--muted); }
-    .hero-sub {
-      font-size: 17px;
-      color: var(--muted);
-      line-height: 1.6;
-      margin-bottom: 38px;
-      max-width: 480px;
-      margin-left: auto;
-      margin-right: auto;
-    }
-    .hero-btns { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
-    .btn-primary {
-      background: var(--text);
-      color: var(--bg);
-      padding: 13px 28px;
+      justify-content: center;
+      gap: 9px;
+      min-height: 46px;
+      padding: 0 20px;
       border-radius: 10px;
+      border: 1px solid transparent;
       font-size: 14px;
       font-weight: 700;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      transition: opacity .15s;
+      transition: transform .18s ease, background .18s ease, border-color .18s ease;
     }
-    .btn-primary:hover { opacity: .88; }
-    .btn-secondary {
-      border: 1px solid var(--border-h);
-      color: var(--muted);
-      padding: 13px 28px;
-      border-radius: 10px;
-      font-size: 14px;
-      font-weight: 500;
-      transition: border-color .15s, color .15s;
-    }
-    .btn-secondary:hover { border-color: rgba(255,255,255,.35); color: var(--text); }
-
-    /* ── POPUP PREVIEW ── */
-    .preview-wrap {
-      max-width: 380px;
-      margin: 60px auto 0;
-      border: 1px solid var(--border-h);
-      border-radius: 16px;
-      overflow: hidden;
-      box-shadow: 0 0 80px rgba(255,255,255,.04), 0 0 0 1px rgba(255,255,255,.06);
-    }
-    .preview-bar {
-      background: rgba(255,255,255,.04);
-      border-bottom: 1px solid var(--border);
-      padding: 10px 16px;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-    .preview-dot { width: 10px; height: 10px; border-radius: 50%; background: rgba(255,255,255,.15); }
-    .preview-dot:first-child { background: #ef4444; }
-    .preview-dot:nth-child(2) { background: #f59e0b; }
-    .preview-dot:nth-child(3) { background: #22c55e; }
-    .preview-body {
-      padding: 24px;
-      background: #0a0a0a;
-    }
-    .preview-header {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      margin-bottom: 20px;
-    }
-    .preview-icon {
-      width: 36px; height: 36px;
-      border-radius: 9px;
-      background: #111;
-      border: 1px solid var(--border-h);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-    .preview-icon svg { width: 20px; height: 20px; }
-    .preview-title { font-size: 15px; font-weight: 700; }
-    .preview-sub { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: .5px; }
-
-    .preview-power {
-      display: flex;
-      align-items: center;
-      gap: 14px;
-      padding: 16px;
-      border: 1px solid rgba(255,255,255,.12);
-      border-radius: 12px;
-      margin-bottom: 16px;
-      background: rgba(255,255,255,.02);
-    }
-    .pwr-ring {
-      width: 48px; height: 48px;
-      border-radius: 50%;
-      border: 1.5px solid rgba(255,255,255,.6);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      box-shadow: 0 0 16px rgba(255,255,255,.08);
-      flex-shrink: 0;
-    }
-    .pwr-ring svg { width: 20px; height: 20px; }
-    .preview-on { font-size: 14px; font-weight: 700; }
-    .preview-on-sub { font-size: 11px; color: var(--muted); }
-
-    .preview-chips { display: flex; gap: 6px; margin-bottom: 14px; }
-    .chip {
-      padding: 4px 12px;
-      border-radius: 6px;
-      border: 1px solid var(--border-h);
-      font-size: 11px;
-      color: var(--muted);
-    }
-    .chip.active {
-      background: rgba(255,255,255,.07);
-      border-color: rgba(255,255,255,.4);
-      color: var(--text);
-      font-weight: 600;
-    }
-
-    .preview-slider-row { display: flex; align-items: center; gap: 10px; }
-    .preview-slider {
-      flex: 1;
-      height: 3px;
-      border-radius: 3px;
-      background: linear-gradient(to right, rgba(255,255,255,.7) 0%, rgba(255,255,255,.7) 55%, rgba(255,255,255,.1) 55%, rgba(255,255,255,.1) 100%);
-      position: relative;
-    }
-    .preview-thumb {
-      position: absolute;
-      left: calc(55% - 7px);
-      top: -5px;
-      width: 13px; height: 13px;
-      border-radius: 50%;
-      background: #fff;
-    }
-    .preview-db { font-size: 11px; font-weight: 700; width: 40px; text-align: right; }
-
-    /* ── FEATURES ── */
-    section { padding: 80px 20px; }
-    .section-inner { max-width: 1000px; margin: 0 auto; }
-    .section-label {
-      font-size: 11px;
-      font-weight: 700;
-      letter-spacing: 1px;
-      text-transform: uppercase;
-      color: var(--muted);
-      margin-bottom: 12px;
-    }
-    .section-title {
-      font-size: clamp(28px, 4vw, 42px);
-      font-weight: 800;
-      letter-spacing: -1px;
-      margin-bottom: 50px;
-      line-height: 1.1;
-    }
-    .features {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-      gap: 16px;
-    }
-    .feature-card {
-      border: 1px solid var(--border);
-      border-radius: 14px;
-      padding: 26px;
-      background: var(--card);
-      transition: border-color .2s, background .2s;
-    }
-    .feature-card:hover {
-      border-color: var(--border-h);
-      background: rgba(255,255,255,.05);
-    }
-    .feature-icon {
-      font-size: 24px;
-      margin-bottom: 14px;
-      display: block;
-    }
-    .feature-card h3 { font-size: 15px; font-weight: 700; margin-bottom: 8px; }
-    .feature-card p { font-size: 13px; color: var(--muted); line-height: 1.55; }
-
-    /* ── HOW IT WORKS ── */
-    .steps { display: flex; flex-direction: column; gap: 0; max-width: 560px; }
-    .step { display: flex; gap: 20px; padding-bottom: 32px; position: relative; }
-    .step:not(:last-child)::before {
+    .button:hover { transform: translateY(-2px); }
+    .button-primary { background: var(--text); color: #05070b; }
+    .button-primary:hover { background: #dcecff; }
+    .button-secondary { border-color: var(--line); color: var(--text); background: rgba(255,255,255,.02); }
+    .button-secondary:hover { border-color: #3a4b61; background: rgba(255,255,255,.05); }
+    .hero { padding: 100px 0 86px; overflow: hidden; }
+    .hero-grid { display: grid; grid-template-columns: 1.02fr .98fr; align-items: center; gap: 72px; }
+    .eyebrow { color: var(--accent); font-size: 12px; font-weight: 760; letter-spacing: .14em; text-transform: uppercase; }
+    h1, h2, h3, p { margin-top: 0; }
+    h1 { max-width: 680px; margin-bottom: 24px; font-size: clamp(48px, 6vw, 78px); line-height: .98; letter-spacing: -.065em; font-weight: 790; }
+    h1 span { color: var(--muted); }
+    .hero-copy > p { max-width: 590px; margin-bottom: 32px; color: var(--muted); font-size: 18px; line-height: 1.65; }
+    .hero-actions { display: flex; flex-wrap: wrap; gap: 12px; }
+    .microcopy { margin-top: 18px; color: var(--muted); font-size: 12px; letter-spacing: .02em; }
+    .hero-visual { position: relative; min-height: 570px; display: grid; place-items: center; }
+    .hero-visual::before {
       content: "";
       position: absolute;
-      left: 17px;
-      top: 38px;
-      bottom: 0;
-      width: 1px;
-      background: var(--border);
-    }
-    .step-num {
-      width: 36px; height: 36px;
+      width: 520px;
+      height: 520px;
       border-radius: 50%;
-      border: 1px solid var(--border-h);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 13px;
-      font-weight: 700;
-      flex-shrink: 0;
-      background: var(--bg);
+      border: 1px solid rgba(114,183,255,.13);
+      box-shadow: 0 0 120px rgba(46,140,255,.09), inset 0 0 100px rgba(46,140,255,.04);
     }
-    .step-body h3 { font-size: 15px; font-weight: 700; margin-bottom: 4px; padding-top: 5px; }
-    .step-body p { font-size: 13px; color: var(--muted); line-height: 1.55; }
-
-    /* ── CTA BAND ── */
-    .cta-band {
-      border-top: 1px solid var(--border);
-      border-bottom: 1px solid var(--border);
-      padding: 80px 20px;
-      text-align: center;
-      background: linear-gradient(180deg, rgba(255,255,255,.015) 0%, transparent 100%);
+    .browser-frame {
+      position: relative;
+      z-index: 1;
+      width: min(100%, 390px);
+      overflow: hidden;
+      border: 1px solid #2a3648;
+      border-radius: 16px;
+      background: #0a0d13;
+      box-shadow: 0 35px 90px rgba(0,0,0,.55);
+      transform: rotate(-1.5deg);
     }
-    .cta-band h2 { font-size: clamp(28px, 4vw, 44px); font-weight: 800; letter-spacing: -1px; margin-bottom: 16px; }
-    .cta-band p { color: var(--muted); margin-bottom: 32px; font-size: 16px; }
-
-    /* ── FOOTER ── */
-    footer {
-      padding: 32px 40px;
-      border-top: 1px solid var(--border);
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      flex-wrap: wrap;
-      gap: 16px;
-    }
-    .footer-logo { font-size: 14px; font-weight: 700; letter-spacing: -.3px; }
-    .footer-links { display: flex; gap: 24px; }
-    .footer-links a { font-size: 12px; color: var(--muted); transition: color .15s; }
+    .browser-bar { height: 42px; display: flex; align-items: center; gap: 7px; padding: 0 14px; border-bottom: 1px solid var(--line); background: #111722; }
+    .browser-dot { width: 8px; height: 8px; border-radius: 50%; background: #3a4658; }
+    .browser-address { flex: 1; margin-left: 8px; padding: 4px 10px; border-radius: 6px; background: #090d14; color: #7d8b9e; font-size: 10px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .browser-frame img { display: block; width: 100%; height: auto; background: #000; }
+    .live-pill { position: absolute; right: -12px; bottom: 44px; z-index: 2; display: flex; align-items: center; gap: 9px; padding: 10px 14px; border: 1px solid #2a3648; border-radius: 999px; background: #0d131d; box-shadow: 0 12px 32px rgba(0,0,0,.35); font-size: 12px; font-weight: 650; }
+    .live-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--on); box-shadow: 0 0 0 4px rgba(85,214,139,.12); }
+    section { padding: 88px 0; }
+    .section-head { display: flex; align-items: end; justify-content: space-between; gap: 40px; margin-bottom: 44px; }
+    .section-head h2 { max-width: 700px; margin-bottom: 0; font-size: clamp(32px, 4.4vw, 52px); line-height: 1.08; letter-spacing: -.045em; }
+    .section-head p { max-width: 390px; margin-bottom: 4px; color: var(--muted); }
+    .benefits { border-top: 1px solid var(--line); }
+    .benefit { display: grid; grid-template-columns: 90px 1fr 1.15fr; gap: 28px; padding: 30px 0; border-bottom: 1px solid var(--line); align-items: start; }
+    .benefit-num { color: var(--accent); font-size: 12px; font-weight: 760; letter-spacing: .12em; }
+    .benefit h3 { margin-bottom: 0; font-size: 22px; letter-spacing: -.025em; }
+    .benefit p { margin-bottom: 0; color: var(--muted); font-size: 15px; }
+    .preset-section { background: var(--surface); border-block: 1px solid var(--line); }
+    .preset-layout { display: grid; grid-template-columns: .8fr 1.2fr; gap: 72px; align-items: start; }
+    .preset-copy h2 { margin-bottom: 20px; font-size: clamp(34px, 4.5vw, 56px); line-height: 1.04; letter-spacing: -.05em; }
+    .preset-copy p { color: var(--muted); }
+    .preset-list { border-top: 1px solid var(--line); }
+    .preset-row { display: grid; grid-template-columns: 1fr auto; gap: 24px; padding: 19px 0; border-bottom: 1px solid var(--line); align-items: baseline; }
+    .preset-row strong { font-size: 17px; }
+    .preset-row span { color: var(--muted); font-size: 13px; text-align: right; }
+    .steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 36px; counter-reset: step; }
+    .step { counter-increment: step; padding-top: 22px; border-top: 2px solid var(--accent); }
+    .step::before { content: "0" counter(step); display: block; margin-bottom: 42px; color: var(--accent); font-size: 12px; font-weight: 760; letter-spacing: .12em; }
+    .step h3 { margin-bottom: 12px; font-size: 21px; letter-spacing: -.025em; }
+    .step p { margin-bottom: 0; color: var(--muted); font-size: 14px; }
+    .compat { margin-top: 36px; padding: 18px 20px; border-left: 2px solid var(--accent); background: rgba(114,183,255,.05); color: var(--muted); font-size: 13px; }
+    .privacy-band { padding: 54px 0; border-block: 1px solid var(--line); background: #080c12; }
+    .privacy-grid { display: grid; grid-template-columns: .9fr 1.1fr; gap: 80px; align-items: center; }
+    .privacy-grid h2 { margin-bottom: 0; font-size: clamp(34px, 4.2vw, 52px); line-height: 1.06; letter-spacing: -.045em; }
+    .privacy-points { display: grid; grid-template-columns: 1fr 1fr; gap: 22px 30px; }
+    .privacy-point { display: flex; gap: 12px; color: var(--muted); font-size: 14px; }
+    .check { flex: 0 0 20px; width: 20px; height: 20px; display: grid; place-items: center; border: 1px solid rgba(85,214,139,.45); border-radius: 50%; color: var(--on); font-size: 12px; }
+    .faq { max-width: 880px; margin-inline: auto; }
+    .faq .section-head { display: block; text-align: center; }
+    .faq .section-head h2 { margin-bottom: 14px; }
+    details { border-bottom: 1px solid var(--line); }
+    summary { position: relative; padding: 23px 42px 23px 0; cursor: pointer; font-size: 17px; font-weight: 650; list-style: none; }
+    summary::-webkit-details-marker { display: none; }
+    summary::after { content: "+"; position: absolute; right: 4px; top: 20px; color: var(--accent); font-size: 24px; font-weight: 400; }
+    details[open] summary::after { content: "−"; }
+    details p { padding: 0 42px 24px 0; margin-bottom: 0; color: var(--muted); font-size: 14px; }
+    .closing { padding: 110px 0; text-align: center; background: radial-gradient(circle at 50% 120%, rgba(46,140,255,.18), transparent 58%); }
+    .closing h2 { margin-bottom: 18px; font-size: clamp(42px, 6vw, 74px); line-height: 1; letter-spacing: -.06em; }
+    .closing p { max-width: 570px; margin: 0 auto 30px; color: var(--muted); font-size: 17px; }
+    footer { padding: 28px 0; border-top: 1px solid var(--line); color: var(--muted); font-size: 12px; }
+    .footer-inner { display: flex; align-items: center; justify-content: space-between; gap: 20px; flex-wrap: wrap; }
+    .footer-links { display: flex; gap: 22px; }
     .footer-links a:hover { color: var(--text); }
-    .footer-copy { font-size: 12px; color: var(--muted); }
-
-    @media (max-width: 600px) {
-      nav { padding: 16px 20px; }
+    @media (max-width: 900px) {
+      .hero-grid, .preset-layout, .privacy-grid { grid-template-columns: 1fr; gap: 44px; }
+      .hero { padding-top: 72px; }
+      .hero-visual { min-height: 500px; }
+      .section-head { display: block; }
+      .section-head p { margin-top: 18px; }
+      .benefit { grid-template-columns: 56px 1fr; }
+      .benefit p { grid-column: 2; }
+      .steps { grid-template-columns: 1fr; gap: 34px; }
+      .step::before { margin-bottom: 18px; }
+    }
+    @media (max-width: 640px) {
+      .wrap { width: min(100% - 32px, var(--max)); }
+      .nav-inner { min-height: 64px; }
       .nav-links { display: none; }
-      footer { padding: 24px 20px; }
+      .nav .button { min-height: 38px; padding: 0 14px; font-size: 12px; }
+      .hero { padding: 58px 0 54px; }
+      h1 { font-size: clamp(43px, 14vw, 62px); }
+      .hero-copy > p { font-size: 16px; }
+      .hero-visual { min-height: 430px; }
+      .hero-visual::before { width: 360px; height: 360px; }
+      .browser-frame { width: 300px; }
+      .live-pill { right: 0; bottom: 22px; }
+      section { padding: 64px 0; }
+      .benefit { gap: 16px; }
+      .benefit h3 { font-size: 19px; }
+      .privacy-points { grid-template-columns: 1fr; }
+      .closing { padding: 80px 0; }
+      .footer-inner { align-items: flex-start; flex-direction: column; }
     }
-  
-    .lang-switcher { display: flex; gap: 4px; }
-    .lang-btn {
-      background: none; border: 1px solid var(--border); border-radius: 5px;
-      color: var(--muted); font-size: 11px; font-weight: 600; padding: 4px 7px;
-      cursor: pointer; transition: border-color .15s, color .15s;
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      *, *::before, *::after { transition: none !important; animation: none !important; }
     }
-    .lang-btn:hover, .lang-btn.active { border-color: var(--border-h); color: var(--text); }
   </style>
 </head>
 <body>
-
-<!-- NAV -->
-<nav>
-  <div class="nav-logo">
-    <svg viewBox="0 0 28 28" fill="none">
-      <rect width="28" height="28" rx="7" fill="#111"/>
-      <rect x="3"  y="16" width="3" height="9"  rx="1.5" fill="white" opacity=".5"/>
-      <rect x="8"  y="11" width="3" height="14" rx="1.5" fill="white" opacity=".7"/>
-      <rect x="13" y="6"  width="3" height="19" rx="1.5" fill="white"/>
-      <rect x="18" y="9"  width="3" height="16" rx="1.5" fill="white" opacity=".7"/>
-      <rect x="23" y="14" width="3" height="11" rx="1.5" fill="white" opacity=".5"/>
-    </svg>
-    BassWave
-  </div>
-  <div class="nav-links">
-    <a href="#features">Features</a>
-    <a href="#how">How it works</a>
-    <a href="privacy.html">Privacy</a>
-    <a href="terms.html">Terms</a>
-  </div>
-  <div class="lang-switcher">
-    <button class="lang-btn" data-lang="en">EN</button>
-    <button class="lang-btn" data-lang="pl">PL</button>
-    <button class="lang-btn" data-lang="de">DE</button>
-    <button class="lang-btn" data-lang="fr">FR</button>
-    <button class="lang-btn" data-lang="es">ES</button>
-    <button class="lang-btn" data-lang="pt_BR">PT</button>
-    <button class="lang-btn" data-lang="it">IT</button>
-    <button class="lang-btn" data-lang="ru">RU</button>
-    <button class="lang-btn" data-lang="ja">JA</button>
-    <button class="lang-btn" data-lang="zh_CN">ZH</button>
-    <button class="lang-btn" data-lang="ko">KO</button>
-  </div>
-  <a class="nav-cta" href="https://chromewebstore.google.com/detail/basswave-audio-booster/dkemfignbandgplpcoaejidehadikdlf" target="_blank">
-    Add to Chrome — Free
-  </a>
-</nav>
-
-<!-- HERO -->
-<div class="hero">
-  <div class="hero-badge"><span></span> <span id="badgeText">Available on Chrome Web Store</span></div>
-  <h1 id="heroTitle">Deep bass.<br><em>Zero distortion.</em></h1>
-  <p class="hero-sub" id="heroSub">
-    BassWave boosts the low end on any Chrome tab — music, video, podcasts —
-    using a professional audio chain that eliminates harsh clipping at high volumes.
-  </p>
-  <div class="hero-btns">
-    <a class="btn-primary" href="https://chromewebstore.google.com/detail/basswave-audio-booster/dkemfignbandgplpcoaejidehadikdlf" target="_blank">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z"/><path d="M8 12l4-4 4 4M12 8v8"/></svg>
-      <span id="ctaBtn">Add to Chrome — Free</span>
-    </a>
-    <a class="btn-secondary" href="#features" id="seeFeaturesBtn">See features</a>
-  </div>
-
-  <!-- fake popup preview -->
-  <div class="preview-wrap">
-    <div class="preview-bar">
-      <div class="preview-dot"></div>
-      <div class="preview-dot"></div>
-      <div class="preview-dot"></div>
+  <header class="nav">
+    <div class="wrap nav-inner">
+      <a class="brand" href="#top" aria-label="BassWave home">
+        <img src="assets/basswave-store-icon.png" alt="" width="30" height="30">
+        BassWave
+      </a>
+      <nav class="nav-links" aria-label="Main navigation">
+        <a href="#features">Features</a>
+        <a href="#presets">Presets</a>
+        <a href="#how">How it works</a>
+        <a href="#privacy">Privacy</a>
+        <a href="#faq">FAQ</a>
+      </nav>
+      <a class="button button-primary" href="https://chromewebstore.google.com/detail/basswave/dkemfignbandgplpcoaejidehadikdlf" target="_blank" rel="noopener noreferrer">Add to Chrome</a>
     </div>
-    <div class="preview-body">
-      <div class="preview-header">
-        <div class="preview-icon">
-          <svg viewBox="0 0 20 20" fill="none">
-            <rect x="1"  y="11" width="2.5" height="8"  rx="1.25" fill="white" opacity=".5"/>
-            <rect x="5"  y="7"  width="2.5" height="12" rx="1.25" fill="white" opacity=".7"/>
-            <rect x="9"  y="3"  width="2.5" height="16" rx="1.25" fill="white"/>
-            <rect x="13" y="6"  width="2.5" height="13" rx="1.25" fill="white" opacity=".7"/>
-            <rect x="17" y="10" width="2.5" height="9"  rx="1.25" fill="white" opacity=".5"/>
-          </svg>
-        </div>
-        <div>
-          <div class="preview-title">BassWave</div>
-          <div class="preview-sub">Audio Booster</div>
-        </div>
-      </div>
+  </header>
 
-      <div class="preview-power">
-        <div class="pwr-ring">
-          <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round">
-            <circle cx="12" cy="12" r="3" fill="white"/>
-            <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/>
-          </svg>
+  <main id="top">
+    <section class="hero">
+      <div class="wrap hero-grid">
+        <div class="hero-copy">
+          <div class="eyebrow">BassWave for Chrome</div>
+          <h1>Take control<br><span>of the low end.</span></h1>
+          <p>Shape bass and clarity on eligible Chrome tabs with five presets, a manual gain slider, Smooth Peaks, and your choice of 2.2 or 2.1 Classic sound. Audio stays on your device.</p>
+          <div class="hero-actions">
+            <a class="button button-primary" href="https://chromewebstore.google.com/detail/basswave/dkemfignbandgplpcoaejidehadikdlf" target="_blank" rel="noopener noreferrer">Add to Chrome — Free</a>
+            <a class="button button-secondary" href="#how">See how it works</a>
+          </div>
+          <div class="microcopy">No account. No analytics. No audio uploads.</div>
         </div>
-        <div>
-          <div class="preview-on" id="previewOn">Active</div>
-          <div class="preview-on-sub" id="previewOnSub">Bass is being boosted on this tab</div>
+        <div class="hero-visual" aria-label="BassWave popup preview">
+          <div class="browser-frame">
+            <div class="browser-bar" aria-hidden="true">
+              <span class="browser-dot"></span><span class="browser-dot"></span><span class="browser-dot"></span>
+              <div class="browser-address">BassWave · Audio Booster</div>
+            </div>
+            <img src="assets/basswave-popup.png" alt="BassWave popup showing the site icon, recommended Medium preset, bass gain, Smooth Peaks, and the 2.2 or 2.1 Classic sound-engine selector" width="360" height="525">
+          </div>
+          <div class="live-pill"><span class="live-dot" aria-hidden="true"></span>Processing stays local</div>
         </div>
       </div>
+    </section>
 
-      <div style="font-size:9px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:rgba(255,255,255,.38);margin-bottom:8px;" id="presetLabel">Preset</div>
-      <div class="preview-chips" style="margin-bottom:14px;">
-        <div class="chip">Soft</div>
-        <div class="chip active">Medium</div>
-        <div class="chip">Strong</div>
-        <div class="chip" style="opacity:.4;">Chipmunks</div>
+    <section id="features">
+      <div class="wrap">
+        <div class="section-head">
+          <h2>Small popup.<br>Useful control.</h2>
+          <p>Keep the sound you want without adding another audio app, account, or complicated setup.</p>
+        </div>
+        <div class="benefits">
+          <article class="benefit"><div class="benefit-num">01</div><h3>Five clear presets</h3><p>Default, Soft, Medium, Strong, and Chipmunks give you a starting point for different listening moods. Medium is the recommended +14 dB setting.</p></article>
+          <article class="benefit"><div class="benefit-num">02</div><h3>A slider for your taste</h3><p>Adjust bass gain from 0 to +30 dB and fine-tune each eligible tab without leaving the popup.</p></article>
+          <article class="benefit"><div class="benefit-num">03</div><h3>Peak management built in</h3><p>Compression, soft clipping, and Smooth Peaks help manage peaks as you adjust the sound.</p></article>
+          <article class="benefit"><div class="benefit-num">04</div><h3>Independent tab control</h3><p>Keep different presets and gain levels for different tabs. The popup shows the site icon and title, with clear active status in the toolbar.</p></article>
+          <article class="benefit"><div class="benefit-num">05</div><h3>Keyboard control</h3><p>Toggle BassWave with Alt+Shift+B.</p></article>
+          <article class="benefit"><div class="benefit-num">06</div><h3>Local audio processing</h3><p>Your tab audio is processed in your browser. BassWave does not upload audio, use analytics, or require an account.</p></article>
+          <article class="benefit"><div class="benefit-num">07</div><h3>2.1 Classic sound engine</h3><p>Prefer the original behavior? Switch from the current 2.2 engine to 2.1 Classic directly in the popup.</p></article>
+        </div>
       </div>
+    </section>
 
-      <div style="font-size:9px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:rgba(255,255,255,.38);margin-bottom:8px;" id="gainLabel">Bass Gain</div>
-      <div class="preview-slider-row">
-        <div class="preview-slider"><div class="preview-thumb"></div></div>
-        <div class="preview-db">+14 dB</div>
+    <section id="presets" class="preset-section">
+      <div class="wrap preset-layout">
+        <div class="preset-copy">
+          <div class="eyebrow">Presets</div>
+          <h2>Start simple.<br>Adjust from there.</h2>
+          <p>Each preset has a defined sound, and Medium is the recommended starting point. Use the bass-gain slider when you want to go beyond the preset value.</p>
+        </div>
+        <div class="preset-list" role="list" aria-label="BassWave presets">
+          <div class="preset-row" role="listitem"><strong>Default</strong><span>+4 dB volume · added clarity · no added bass</span></div>
+          <div class="preset-row" role="listitem"><strong>Soft</strong><span>+8 dB bass</span></div>
+          <div class="preset-row" role="listitem"><strong>Medium</strong><span>Recommended · +14 dB bass</span></div>
+          <div class="preset-row" role="listitem"><strong>Strong</strong><span>+22 dB bass</span></div>
+          <div class="preset-row" role="listitem"><strong>Chipmunks</strong><span>+8 dB bass · slight pitch shift</span></div>
+        </div>
       </div>
+    </section>
+
+    <section id="how">
+      <div class="wrap">
+        <div class="section-head">
+          <h2>Three steps.<br>Then listen.</h2>
+          <p>No external software, audio cable, or account setup.</p>
+        </div>
+        <div class="steps">
+          <article class="step"><h3>Install BassWave</h3><p>Add BassWave to Chrome from the Chrome Web Store. The icon appears in your toolbar.</p></article>
+          <article class="step"><h3>Play audio in an eligible tab</h3><p>Open a Chrome tab with audio that Chrome allows BassWave to capture.</p></article>
+          <article class="step"><h3>Shape the sound</h3><p>Open BassWave, turn it on, choose a preset, and adjust the bass gain. Keep the 2.2 engine or switch to 2.1 Classic.</p></article>
+        </div>
+        <div class="compat">BassWave does not work on chrome:// pages, file:// pages, the Chrome Web Store, or a tab whose audio is already being captured by another extension.</div>
+      </div>
+    </section>
+
+    <section id="privacy" class="privacy-band">
+      <div class="wrap privacy-grid">
+        <h2>Your audio<br>stays with you.</h2>
+        <div class="privacy-points">
+          <div class="privacy-point"><span class="check" aria-hidden="true">✓</span><span>Audio is processed on your device.</span></div>
+          <div class="privacy-point"><span class="check" aria-hidden="true">✓</span><span>No audio is uploaded.</span></div>
+          <div class="privacy-point"><span class="check" aria-hidden="true">✓</span><span>No account is required.</span></div>
+          <div class="privacy-point"><span class="check" aria-hidden="true">✓</span><span>No analytics or tracking scripts.</span></div>
+          <div class="privacy-point"><span class="check" aria-hidden="true">✓</span><span>Preset, gain, and engine choices are stored locally.</span></div>
+          <div class="privacy-point"><span class="check" aria-hidden="true">✓</span><span>Available in 11 languages.</span></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="faq" class="faq">
+      <div class="section-head">
+        <div class="eyebrow">FAQ</div>
+        <h2>Good questions.<br>Straight answers.</h2>
+      </div>
+      <details><summary>What does BassWave do?</summary><p>BassWave shapes the bass and clarity of eligible Chrome tabs. It combines five presets, a manual bass-gain slider, Smooth Peaks, compression, and soft clipping.</p></details>
+      <details><summary>Which tabs are supported?</summary><p>BassWave works with tabs that are playing audio and that Chrome allows the extension to capture. It does not support chrome:// pages, file:// pages, the Chrome Web Store, or streams already captured by another extension.</p></details>
+      <details><summary>Which presets are included?</summary><p>Default adds no bass boost and applies +4 dB volume with added clarity. Soft adds +8 dB, Medium +14 dB, and Strong +22 dB. Chipmunks adds +8 dB with a slight pitch shift. Medium is the recommended starting point.</p></details>
+      <details><summary>Can I switch back to the original 2.1 sound?</summary><p>Yes. The popup includes a sound-engine selector. Keep 2.2 Current for smoother parameter changes and a safety limiter in the signal path, or choose 2.1 Classic to preserve the original sound behavior. In 2.1 Classic, turning Smooth Peaks off also bypasses peak limiting, so reduce bass gain if the audio distorts.</p></details>
+      <details><summary>Does BassWave guarantee distortion-free audio?</summary><p>No. Bass boost and higher volume can make existing distortion more noticeable. Smooth Peaks, compression, and soft clipping help manage peaks, but they cannot guarantee distortion-free audio in every source or listening setup.</p></details>
+      <details><summary>Does BassWave require an account or upload my audio?</summary><p>No. BassWave processes audio locally in your browser. It does not require an account, use analytics, or upload audio.</p></details>
+      <details><summary>Can I control more than one tab?</summary><p>Yes. Each eligible tab keeps its own processing state, preset, and gain while the extension is running. Closing or navigating away from a tab stops its processing.</p></details>
+    </section>
+
+    <section class="closing">
+      <div class="wrap">
+        <h2>Shape your tab audio.</h2>
+        <p>Choose a preset, tune the gain, pick 2.2 or 2.1 Classic, and keep audio processing on your device.</p>
+        <a class="button button-primary" href="https://chromewebstore.google.com/detail/basswave/dkemfignbandgplpcoaejidehadikdlf" target="_blank" rel="noopener noreferrer">Add to Chrome — Free</a>
+        <div class="microcopy">Available in 11 languages. No account required.</div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="wrap footer-inner">
+      <a class="brand" href="#top"><img src="assets/basswave-store-icon.png" alt="" width="24" height="24">BassWave</a>
+      <div class="footer-links">
+        <a href="privacy.html">Privacy</a>
+        <a href="terms.html">Terms</a>
+        <a href="refund.html">Refund</a>
+        <a href="https://github.com/ggrp-byte/BassWave/issues" target="_blank" rel="noopener noreferrer">Support</a>
+      </div>
+      <span>© 2026 BassWave</span>
     </div>
-  </div>
-</div>
-
-<!-- FEATURES -->
-<section id="features">
-  <div class="section-inner">
-    <div class="section-label">Features</div>
-    <div class="section-title" id="featTitle">Built for people<br>who feel music.</div>
-    <div class="features">
-      <div class="feature-card">
-        <span class="feature-icon">🎚️</span>
-        <h3 id="feat1Title">Professional audio chain</h3>
-        <p id="feat1Desc">Three-stage processing: lowshelf bass boost, subtle highshelf clarity, and a gentle compressor — clean, powerful bass without distortion.</p>
-      </div>
-      <div class="feature-card">
-        <span class="feature-icon">🔊</span>
-        <h3 id="feat2Title">Clean peaks, no clipping</h3>
-        <p id="feat2Desc">A gentle compressor protects against clipping without pumping or distorting. High volume stays punchy and clean.</p>
-      </div>
-      <div class="feature-card">
-        <span class="feature-icon">⚡</span>
-        <h3 id="feat3Title">Any tab, one click</h3>
-        <p id="feat3Desc">Works on YouTube, Spotify Web, SoundCloud, Netflix, Twitch — any Chrome tab with audio. No page reload needed.</p>
-      </div>
-      <div class="feature-card">
-        <span class="feature-icon">🎛️</span>
-        <h3 id="feat4Title">Presets + manual gain</h3>
-        <p id="feat4Desc">Soft, Medium, Strong presets cover most situations. Or drag the slider from 0 to +30 dB and set it exactly where you want it.</p>
-      </div>
-      <div class="feature-card">
-        <span class="feature-icon">⌨️</span>
-        <h3 id="feat5Title">Keyboard shortcut</h3>
-        <p id="feat5Desc">Toggle bass boost with Ctrl+Shift+B without ever opening the popup. Your settings are remembered across sessions.</p>
-      </div>
-      <div class="feature-card">
-        <span class="feature-icon">🔒</span>
-        <h3 id="feat6Title">Zero data collection</h3>
-        <p id="feat6Desc">BassWave processes audio locally in your browser. No microphone access, no analytics, no accounts required for the free version.</p>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- HOW IT WORKS -->
-<section id="how" style="padding-top:0;">
-  <div class="section-inner">
-    <div class="section-label" id="howLabel">How it works</div>
-    <div class="section-title" id="howTitle">Up and running<br>in 30 seconds.</div>
-    <div class="steps">
-      <div class="step">
-        <div class="step-num">1</div>
-        <div class="step-body">
-          <h3 id="step1Title">Install from Chrome Web Store</h3>
-          <p id="step1Desc">Click "Add to Chrome" — no account required, free to install. The BassWave icon appears in your toolbar.</p>
-        </div>
-      </div>
-      <div class="step">
-        <div class="step-num">2</div>
-        <div class="step-body">
-          <h3 id="step2Title">Open any tab with audio</h3>
-          <p id="step2Desc">Navigate to YouTube, Spotify, Netflix, or any other site. Start playing something.</p>
-        </div>
-      </div>
-      <div class="step">
-        <div class="step-num">3</div>
-        <div class="step-body">
-          <h3 id="step3Title">Click the BassWave icon</h3>
-          <p id="step3Desc">Hit the power button. Bass is boosted instantly — adjust the preset and gain to taste. That's it.</p>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- CTA BAND -->
-<div class="cta-band">
-  <h2 id="ctaTitle">Start listening differently.</h2>
-  <p id="ctaSub">Free to install. No account. No tracking.</p>
-  <a class="btn-primary" style="display:inline-flex;" href="https://chromewebstore.google.com/detail/basswave-audio-booster/dkemfignbandgplpcoaejidehadikdlf" target="_blank">
-    <span id="ctaBtn2">Add to Chrome — Free</span>
-  </a>
-</div>
-
-<!-- FOOTER -->
-<footer>
-  <div class="footer-logo">BassWave</div>
-  <div class="footer-links">
-    <a href="privacy.html">Privacy Policy</a>
-    <a href="terms.html">Terms of Service</a>
-    <a href="refund.html">Refund Policy</a>
-    <a href="https://github.com/ggrp-byte/BassWave/issues" target="_blank">Contact</a>
-  </div>
-  <div class="footer-copy">© 2025 BassWave. All rights reserved.</div>
-</footer>
-
-<script>
-const TRANSLATIONS = {
-  en: {
-    badge: "Available on Chrome Web Store",
-    hero: "Deep bass.<br><em>Zero distortion.</em>",
-    sub: "BassWave boosts the low end on any Chrome tab — music, video, podcasts — using a professional audio chain that eliminates harsh clipping at high volumes. ⚠️ Adjust system + player volume to avoid distortion.",
-    cta: "Add to Chrome — Free",
-    seeFeatures: "See features",
-    featTitle: "Built for people<br>who feel music.",
-    feat1Title: "Professional audio chain",
-    feat1Desc: "Three-stage processing: lowshelf bass boost, subtle highshelf clarity, and a gentle compressor — clean, powerful bass without distortion.",
-    feat2Title: "Clean peaks, no clipping",
-    feat2Desc: "A gentle compressor protects against clipping without pumping or distorting. High volume stays punchy and clean.",
-    feat3Title: "Any tab, one click",
-    feat3Desc: "Works on YouTube, Spotify Web, SoundCloud, Netflix, Twitch — any Chrome tab with audio. No page reload needed.",
-    feat4Title: "Presets + manual gain",
-    feat4Desc: "Soft, Medium, Strong presets cover most situations. Or drag the slider from 0 to +30 dB and set it exactly where you want it.",
-    feat5Title: "Keyboard shortcut",
-    feat5Desc: "Toggle bass boost with Ctrl+Shift+B without ever opening the popup. Your settings are remembered across sessions.",
-    feat6Title: "Zero data collection",
-    feat6Desc: "BassWave processes audio locally in your browser. No microphone access, no analytics, no accounts required for the free version.",
-    howLabel: "How it works",
-    howTitle: "Up and running<br>in 30 seconds.",
-    step1Title: "Install from Chrome Web Store",
-    step1Desc: "Click \"Add to Chrome\" — no account required, free to install. The BassWave icon appears in your toolbar.",
-    step2Title: "Open any tab with audio",
-    step2Desc: "Navigate to YouTube, Spotify, Netflix, or any other site. Start playing something.",
-    step3Title: "Click the BassWave icon",
-    step3Desc: "Hit the power button. Bass is boosted instantly — adjust the preset and gain to taste. That's it.",
-    ctaTitle: "Start listening differently.",
-    ctaSub: "Free to install. No account. No tracking."
-  },
-  pl: {
-    badge: "Dostępne w Chrome Web Store",
-    hero: "Głęboki bas.<br><em>Zero przesterów.</em>",
-    sub: "BassWave wzmacnia dół pasma na dowolnej karcie Chrome — muzyka, wideo, podcasty — używając profesjonalnego łańcucha audio. ⚠️ Dostosuj głośność systemu i odtwarzacza aby uniknąć przesterów.",
-    cta: "Dodaj do Chrome — Za darmo",
-    seeFeatures: "Zobacz funkcje",
-    featTitle: "Dla tych, którzy<br>czują muzykę.",
-    feat1Title: "Profesjonalny łańcuch audio",
-    feat1Desc: "Trzyetapowe przetwarzanie: lowshelf boost basu, subtelna przejrzystość highshelf i delikatny kompresor — czysty, mocny bas bez zniekształceń.",
-    feat2Title: "Czyste szczyty, bez przesterów",
-    feat2Desc: "Delikatny kompresor chroni przed przesterami bez pompowania lub zniekształceń. Wysoka głośność pozostaje wyraźna i czysta.",
-    feat3Title: "Dowolna karta, jeden klik",
-    feat3Desc: "Działa na YouTube, Spotify Web, SoundCloud, Netflix, Twitch — dowolna karta Chrome z audio. Bez przeładowania strony.",
-    feat4Title: "Presety + manualny gain",
-    feat4Desc: "Presety Soft, Medium, Strong pokrywają większość sytuacji. Lub przeciągnij suwak od 0 do +30 dB i ustaw dokładnie tam, gdzie chcesz.",
-    feat5Title: "Skrót klawiszowy",
-    feat5Desc: "Przełącz boost basu klawiszem Ctrl+Shift+B bez otwierania popupu. Ustawienia są zapamiętywane między sesjami.",
-    feat6Title: "Zero zbierania danych",
-    feat6Desc: "BassWave przetwarza audio lokalnie w przeglądarce. Brak dostępu do mikrofonu, brak analytics, brak kont dla wersji free.",
-    howLabel: "Jak to działa",
-    howTitle: "Gotowe w 30 sekund.",
-    step1Title: "Zainstaluj z Chrome Web Store",
-    step1Desc: "Kliknij \"Dodaj do Chrome\" — nie wymaga konta, za darmo. Ikona BassWave pojawi się w pasku narzędzi.",
-    step2Title: "Otwórz dowolną kartę z audio",
-    step2Desc: "Przejdź do YouTube, Spotify, Netflix lub innej strony. Zacznij odtwarzać.",
-    step3Title: "Kliknij ikonę BassWave",
-    step3Desc: "Naciśnij przycisk zasilania. Bas jest wzmacniany od razu — dostosuj preset i gain do smaku. To wszystko.",
-    ctaTitle: "Zacznij słuchać inaczej.",
-    ctaSub: "Bezpłatna instalacja. Bez konta. Bez śledzenia."
-  },
-  de: {
-    badge: "Im Chrome Web Store verfügbar",
-    hero: "Tiefer Bass.<br><em>Null Verzerrung.</em>",
-    sub: "BassWave verstärkt den Bassbereich auf jedem Chrome-Tab — Musik, Video, Podcasts — mit professioneller Audio-Verarbeitung ohne hartes Clipping. ⚠️ Reguliere System- und Player-Lautstärke um Verzerrungen zu vermeiden.",
-    cta: "Zu Chrome hinzufügen — Kostenlos",
-    seeFeatures: "Funktionen ansehen",
-    featTitle: "Für Menschen, die<br>Musik fühlen.",
-    feat1Title: "Professionelle Audio-Kette",
-    feat1Desc: "Drei-Stufen-Verarbeitung: Lowshelf-Bass-Boost, subtiler Highshelf-Klang und ein sanfter Kompressor — sauberer, mächtiger Bass ohne Verzerrung.",
-    feat2Title: "Saubere Peaks, kein Clipping",
-    feat2Desc: "Ein sanfter Kompressor schützt vor Clipping ohne Pumpen oder Verzerrungen. Hohe Lautstärke bleibt kräftig und sauber.",
-    feat3Title: "Jeder Tab, ein Klick",
-    feat3Desc: "Funktioniert auf YouTube, Spotify Web, SoundCloud, Netflix, Twitch — jeder Chrome-Tab mit Audio. Kein Neuladen nötig.",
-    feat4Title: "Presets + manueller Gain",
-    feat4Desc: "Soft, Medium, Strong Presets decken die meisten Fälle ab. Oder ziehe den Regler von 0 bis +30 dB und setze ihn genau dort, wo du willst.",
-    feat5Title: "Tastenkürzel",
-    feat5Desc: "Schalte Bass-Boost mit Ctrl+Shift+B ohne das Popup zu öffnen. Deine Einstellungen werden über Sitzungen hinweg gespeichert.",
-    feat6Title: "Keine Datenerfassung",
-    feat6Desc: "BassWave verarbeitet Audio lokal in deinem Browser. Kein Mikrofonzugriff, keine Analytik, keine Konten für die kostenlose Version.",
-    howLabel: "So funktioniert's",
-    howTitle: "In 30 Sekunden<br>bereit.",
-    step1Title: "Aus dem Chrome Web Store installieren",
-    step1Desc: "Klicke auf \"Zu Chrome hinzufügen\" — kein Konto erforderlich, kostenlos. Das BassWave-Symbol erscheint in deiner Symbolleiste.",
-    step2Title: "Öffne einen Tab mit Audio",
-    step2Desc: "Navigiere zu YouTube, Spotify, Netflix oder einer anderen Seite. Starte die Wiedergabe.",
-    step3Title: "Klicke auf das BassWave-Symbol",
-    step3Desc: "Drücke den Einschaltknopf. Der Bass wird sofort verstärkt — passe Preset und Gain nach Geschmack an. Das war's.",
-    ctaTitle: "Höre anders.",
-    ctaSub: "Kostenlos. Kein Konto. Kein Tracking."
-  },
-  fr: {
-    badge: "Disponible sur le Chrome Web Store",
-    hero: "Basses profondes.<br><em>Zéro distorsion.</em>",
-    sub: "BassWave booste les graves sur tout onglet Chrome — musique, vidéo, podcasts — avec un traitement audio pro sans écrêtage. ⚠️ Ajustez le volume système et du lecteur pour éviter la distorsion.",
-    cta: "Ajouter à Chrome — Gratuit",
-    seeFeatures: "Voir les fonctionnalités",
-    featTitle: "Pour ceux qui<br>ressentent la musique.",
-    feat1Title: "Chaîne audio professionnelle",
-    feat1Desc: "Traitement en trois étapes : boost de basses lowshelf, clarté highshelf subtile et compresseur doux — basses puissantes et propres sans distorsion.",
-    feat2Title: "Pics propres, pas d'écrêtage",
-    feat2Desc: "Un compresseur doux protège contre l'écrêtage sans pomper ni distordre. Le volume fort reste percutant et propre.",
-    feat3Title: "Tout onglet, un clic",
-    feat3Desc: "Fonctionne sur YouTube, Spotify Web, SoundCloud, Netflix, Twitch — tout onglet Chrome avec audio. Pas besoin de recharger.",
-    feat4Title: "Presets + gain manuel",
-    feat4Desc: "Les presets Soft, Medium, Strong couvrent la plupart des cas. Ou glissez le curseur de 0 à +30 dB et réglez-le exactement où vous voulez.",
-    feat5Title: "Raccourci clavier",
-    feat5Desc: "Activez le boost de basses avec Ctrl+Shift+B sans ouvrir le popup. Vos paramètres sont conservés entre les sessions.",
-    feat6Title: "Zéro collecte de données",
-    feat6Desc: "BassWave traite l'audio localement dans votre navigateur. Pas d'accès au micro, pas d'analytique, pas de compte requis pour la version gratuite.",
-    howLabel: "Comment ça marche",
-    howTitle: "Prêt en 30 secondes.",
-    step1Title: "Installer depuis le Chrome Web Store",
-    step1Desc: "Cliquez sur \"Ajouter à Chrome\" — pas de compte requis, gratuit. L'icône BassWave apparaît dans votre barre d'outils.",
-    step2Title: "Ouvrez un onglet avec de l'audio",
-    step2Desc: "Allez sur YouTube, Spotify, Netflix ou tout autre site. Lancez la lecture.",
-    step3Title: "Cliquez sur l'icône BassWave",
-    step3Desc: "Appuyez sur le bouton d'alimentation. Les basses sont boostées instantanément — ajustez le preset et le gain à votre goût. C'est tout.",
-    ctaTitle: "Écoutez différemment.",
-    ctaSub: "Gratuit. Sans compte. Sans tracking."
-  },
-  es: {
-    badge: "Disponible en Chrome Web Store",
-    hero: "Graves profundos.<br><em>Cero distorsión.</em>",
-    sub: "BassWave potencia los graves en cualquier pestaña de Chrome — música, vídeo, podcasts — con procesamiento de audio profesional sin clipping. ⚠️ Ajusta el volumen del sistema y del reproductor para evitar distorsión.",
-    cta: "Añadir a Chrome — Gratis",
-    seeFeatures: "Ver características",
-    featTitle: "Para los que<br>sienten la música.",
-    feat1Title: "Cadena de audio profesional",
-    feat1Desc: "Procesamiento en tres etapas: boost de graves lowshelf, claridad highshelf sutil y compresor suave — graves potentes y limpios sin distorsión.",
-    feat2Title: "Picos limpios, sin clipping",
-    feat2Desc: "Un compresor suave protege contra el clipping sin bombear ni distorsionar. El volumen alto sigue siendo potente y limpio.",
-    feat3Title: "Cualquier pestaña, un clic",
-    feat3Desc: "Funciona en YouTube, Spotify Web, SoundCloud, Netflix, Twitch — cualquier pestaña de Chrome con audio. No es necesario recargar.",
-    feat4Title: "Presets + ganancia manual",
-    feat4Desc: "Los presets Soft, Medium, Strong cubren la mayoría de situaciones. O arrastra el control deslizante de 0 a +30 dB y ajústalo exactamente donde quieras.",
-    feat5Title: "Atajo de teclado",
-    feat5Desc: "Alterna el boost de graves con Ctrl+Shift+B sin abrir el popup. Tu configuración se recuerda entre sesiones.",
-    feat6Title: "Cero recopilación de datos",
-    feat6Desc: "BassWave procesa el audio localmente en tu navegador. Sin acceso al micrófono, sin analytics, sin cuentas requeridas para la versión gratuita.",
-    howLabel: "Cómo funciona",
-    howTitle: "Listo en 30 segundos.",
-    step1Title: "Instalar desde Chrome Web Store",
-    step1Desc: "Haz clic en \"Añadir a Chrome\" — no requiere cuenta, gratuito. El icono de BassWave aparece en tu barra de herramientas.",
-    step2Title: "Abre cualquier pestaña con audio",
-    step2Desc: "Navega a YouTube, Spotify, Netflix o cualquier otro sitio. Empieza a reproducir algo.",
-    step3Title: "Haz clic en el icono de BassWave",
-    step3Desc: "Pulsa el botón de encendido. Los graves se potencian al instante — ajusta el preset y la ganancia a tu gusto. Eso es todo.",
-    ctaTitle: "Escucha de otra manera.",
-    ctaSub: "Gratis. Sin cuenta. Sin rastreo."
-  },
-  pt_BR: {
-    badge: "Disponível na Chrome Web Store",
-    hero: "Graves profundos.<br><em>Zero distorção.</em>",
-    sub: "BassWave amplifica os graves em qualquer aba do Chrome — música, vídeo, podcasts — usando uma cadeia de áudio profissional que elimina o clipping. ⚠️ Ajuste o volume do sistema e do player para evitar distorção.",
-    cta: "Adicionar ao Chrome — Grátis",
-    seeFeatures: "Ver recursos",
-    featTitle: "Para quem<br>sente a música.",
-    feat1Title: "Cadeia de áudio profissional",
-    feat1Desc: "Processamento em três estágios: boost de graves lowshelf, clareza highshelf sutil e compressor suave — graves potentes e limpos sem distorção.",
-    feat2Title: "Picos limpos, sem clipping",
-    feat2Desc: "Um compressor suave protege contra clipping sem bombear ou distorcer. Volume alto permanece potente e limpo.",
-    feat3Title: "Qualquer aba, um clique",
-    feat3Desc: "Funciona no YouTube, Spotify Web, SoundCloud, Netflix, Twitch — qualquer aba do Chrome com áudio. Sem necessidade de recarregar.",
-    feat4Title: "Presets + ganho manual",
-    feat4Desc: "Presets Soft, Medium, Strong cobrem a maioria das situações. Ou arraste o slider de 0 a +30 dB e ajuste exatamente onde deseja.",
-    feat5Title: "Atalho de teclado",
-    feat5Desc: "Alterne o boost de graves com Ctrl+Shift+B sem abrir o popup. Suas configurações são lembradas entre sessões.",
-    feat6Title: "Zero coleta de dados",
-    feat6Desc: "BassWave processa áudio localmente no seu navegador. Sem acesso ao microfone, sem analytics, sem contas necessárias para a versão gratuita.",
-    howLabel: "Como funciona",
-    howTitle: "Pronto em 30 segundos.",
-    step1Title: "Instalar da Chrome Web Store",
-    step1Desc: "Clique em \"Adicionar ao Chrome\" — não requer conta, gratuito. O ícone BassWave aparece na sua barra de ferramentas.",
-    step2Title: "Abra qualquer aba com áudio",
-    step2Desc: "Navegue para YouTube, Spotify, Netflix ou qualquer outro site. Comece a reproduzir algo.",
-    step3Title: "Clique no ícone BassWave",
-    step3Desc: "Aperte o botão de energia. Os graves são amplificados instantaneamente — ajuste o preset e o ganco a gosto. Pronto.",
-    ctaTitle: "Comece a ouvir diferente.",
-    ctaSub: "Gratuito. Sem conta. Sem rastreamento."
-  },
-  it: {
-    badge: "Disponibile su Chrome Web Store",
-    hero: "Bassi profondi.<br><em>Zero distorsioni.</em>",
-    sub: "BassWave potenzia i bassi su qualsiasi scheda Chrome — musica, video, podcast — con una catena audio professionale che elimina il clipping. ⚠️ Regola il volume di sistema e del player per evitare distorsioni.",
-    cta: "Aggiungi a Chrome — Gratis",
-    seeFeatures: "Vedi funzionalità",
-    featTitle: "Per chi<br>sente la musica.",
-    feat1Title: "Catena audio professionale",
-    feat1Desc: "Elaborazione in tre fasi: boost bassi lowshelf, chiarezza highshelf sottile e compressore delicato — bassi potenti e puliti senza distorsioni.",
-    feat2Title: "Picchi puliti, no clipping",
-    feat2Desc: "Un compressore delicato protegge dal clipping senza pompaggio o distorsioni. Il volume alto rimane potente e pulito.",
-    feat3Title: "Qualsiasi scheda, un clic",
-    feat3Desc: "Funziona su YouTube, Spotify Web, SoundCloud, Netflix, Twitch — qualsiasi scheda Chrome con audio. Nessun ricaricamento necessario.",
-    feat4Title: "Preset + gain manuale",
-    feat4Desc: "I preset Soft, Medium, Strong coprono la maggior parte delle situazioni. O trascina il cursore da 0 a +30 dB e impostalo esattamente dove vuoi.",
-    feat5Title: "Scorciatoia da tastiera",
-    feat5Desc: "Attiva il boost dei bassi con Ctrl+Shift+B senza aprire il popup. Le tue impostazioni sono ricordate tra le sessioni.",
-    feat6Title: "Zero raccolta dati",
-    feat6Desc: "BassWave elabora l'audio localmente nel tuo browser. Nessun accesso al microfono, nessuna analytics, nessun account richiesto per la versione gratuita.",
-    howLabel: "Come funziona",
-    howTitle: "Pronto in 30 secondi.",
-    step1Title: "Installa da Chrome Web Store",
-    step1Desc: "Clicca \"Aggiungi a Chrome\" — nessun account richiesto, gratuito. L'icona BassWave appare nella tua barra degli strumenti.",
-    step2Title: "Apri qualsiasi scheda con audio",
-    step2Desc: "Naviga su YouTube, Spotify, Netflix o qualsiasi altro sito. Inizia a riprodurre qualcosa.",
-    step3Title: "Clicca sull'icona BassWave",
-    step3Desc: "Premi il pulsante di accensione. I bassi sono potenziati istantaneamente — adatta il preset e il gain a tuo piacimento. È tutto.",
-    ctaTitle: "Inizia ad ascoltare diversamente.",
-    ctaSub: "Gratuito. Nessun account. Nessun tracking."
-  },
-  ru: {
-    badge: "Доступно в Chrome Web Store",
-    hero: "Глубокий бас.<br><em>Ноль искажений.</em>",
-    sub: "BassWave усиливает басы на любой вкладке Chrome — музыка, видео, подкасты — используя профессиональную аудио-цепь, которая устраняет жёсткий клиппинг. ⚠️ Отрегулируйте громкость системы и плеера, чтобы избежать искажений.",
-    cta: "Добавить в Chrome — Бесплатно",
-    seeFeatures: "Смотреть возможности",
-    featTitle: "Для тех, кто<br>чувствует музыку.",
-    feat1Title: "Профессиональная аудио-цепь",
-    feat1Desc: "Трёхэтапная обработка: усиление басов lowshelf, тонкая ясность highshelf и мягкий компрессор — мощный чистый бас без искажений.",
-    feat2Title: "Чистые пики, без клиппинга",
-    feat2Desc: "Мягкий компрессор защищает от клиппинга без накачки или искажений. Высокая громкость остаётся мощной и чистой.",
-    feat3Title: "Любая вкладка, один клик",
-    feat3Desc: "Работает на YouTube, Spotify Web, SoundCloud, Netflix, Twitch — любая вкладка Chrome с аудио. Без перезагрузки.",
-    feat4Title: "Пресеты + ручной gain",
-    feat4Desc: "Пресеты Soft, Medium, Strong покрывают большинство ситуаций. Или перетащите ползунок от 0 до +30 dB и установите точно там, где хотите.",
-    feat5Title: "Горячая клавиша",
-    feat5Desc: "Переключайте усиление баса Ctrl+Shift+B без открытия popup. Ваши настройки запоминаются между сессиями.",
-    feat6Title: "Нулевой сбор данных",
-    feat6Desc: "BassWave обрабатывает аудио локально в вашем браузере. Нет доступа к микрофону, нет аналитики, нет аккаунтов для бесплатной версии.",
-    howLabel: "Как это работает",
-    howTitle: "Готово за 30 секунд.",
-    step1Title: "Установите из Chrome Web Store",
-    step1Desc: "Нажмите \"Добавить в Chrome\" — не требует аккаунта, бесплатно. Иконка BassWave появится на вашей панели инструментов.",
-    step2Title: "Откройте любую вкладку с аудио",
-    step2Desc: "Перейдите на YouTube, Spotify, Netflix или любой другой сайт. Начните воспроизведение.",
-    step3Title: "Нажмите на иконку BassWave",
-    step3Desc: "Нажмите кнопку питания. Бас усиливается мгновенно — настройте пресет и gain по вкусу. Всё.",
-    ctaTitle: "Начните слушать иначе.",
-    ctaSub: "Бесплатно. Без аккаунта. Без отслеживания."
-  },
-  ja: {
-    badge: "Chrome Web Storeで利用可能",
-    hero: "ディープベース。<br><em>歪みゼロ。</em>",
-    sub: "BassWaveはChromeタブの低音をブーストします — 音楽、動画、ポッドキャスト — 高音量での harsh clipping を排除するプロフェッショナルなオーディオチェインを使用。⚠️ 歪みを避けるためシステムとプレーヤーの音量を調整してください。",
-    cta: "Chromeに追加 — 無料",
-    seeFeatures: "機能を見る",
-    featTitle: "音楽を感じる人のために。",
-    feat1Title: "プロフェッショナル・オーディオチェイン",
-    feat1Desc: "3段階処理: lowshelfベースブースト、微妙なhighshelfクラリティ、ジェントルコンプレッサー — クリーンでパワフルなベース、歪みなし。",
-    feat2Title: "クリーンピーク、クリッピングなし",
-    feat2Desc: "ジェントルコンプレッサーがクリッピングから保護、ポンピングや歪みなし。高音量もパンチyでクリーン。",
-    feat3Title: "任意のタブ、ワンクリック",
-    feat3Desc: "YouTube、Spotify Web、SoundCloud、Netflix、Twitchで動作 — オーディオのあるChromeタブなら何でも。ページリロード不要。",
-    feat4Title: "プリセット + マニュアルゲイン",
-    feat4Desc: "Soft、Medium、Strongプリセットでほとんどの状況に対応。0〜+30dBのスライダーで好みに調整。",
-    feat5Title: "キーボードショートカット",
-    feat5Desc: "Ctrl+Shift+Bでポップアップを開かずにベースブーストを切り替え。設定はセッション間で記憶されます。",
-    feat6Title: "データ収集ゼロ",
-    feat6Desc: "BassWaveはブラウザ内でローカルにオーディオを処理。マイクアクセスなし、アナリティクスなし、無料版はアカウント不要。",
-    howLabel: "使い方",
-    howTitle: "30秒で始められる。",
-    step1Title: "Chrome Web Storeからインストール",
-    step1Desc: "「Chromeに追加」をクリック — アカウント不要、無料。BassWaveアイコンがツールバーに表示されます。",
-    step2Title: "オーディオのあるタブを開く",
-    step2Desc: "YouTube、Spotify、Netflixなどに移動。何か再生を始めます。",
-    step3Title: "BassWaveアイコンをクリック",
-    step3Desc: "電源ボタンを押します。ベースが即座にブースト — プリセットとゲインをお好みで調整。以上です。",
-    ctaTitle: "違う聴き方を始めよう。",
-    ctaSub: "無料。アカウント不要。トラッキングなし。"
-  },
-  zh_CN: {
-    badge: "可在 Chrome Web Store 获取",
-    hero: "深度低音。<br><em>零失真。</em>",
-    sub: "BassWave增强任何Chrome标签的低音 — 音乐、视频、播客 — 使用专业音频链消除高音量下的削波失真。⚠️ 调整系统和播放器音量以避免失真。",
-    cta: "添加到 Chrome — 免费",
-    seeFeatures: "查看功能",
-    featTitle: "为感受音乐的人而生。",
-    feat1Title: "专业音频链",
-    feat1Desc: "三阶段处理：lowshelf低音增强、微妙highshelf清晰度、温和压缩器 — 强劲干净的低音，无失真。",
-    feat2Title: "干净峰值，无削波",
-    feat2Desc: "温和压缩器保护免于削波，无泵效应或失真。高音量保持有力且干净。",
-    feat3Title: "任意标签，一键搞定",
-    feat3Desc: "支持YouTube、Spotify Web、SoundCloud、Netflix、Twitch — 任何有音频的Chrome标签。无需刷新页面。",
-    feat4Title: "预设 + 手动增益",
-    feat4Desc: "柔和、中等、强劲预设覆盖大多数情况。或拖动滑块从0到+30dB，精确设置到您想要的位置。",
-    feat5Title: "键盘快捷键",
-    feat5Desc: "用Ctrl+Shift+B切换低音增强，无需打开弹出窗口。设置会在会话间记住。",
-    feat6Title: "零数据收集",
-    feat6Desc: "BassWave在浏览器本地处理音频。无麦克风访问、无分析、免费版无需账户。",
-    howLabel: "工作原理",
-    howTitle: "30秒上手。",
-    step1Title: "从 Chrome Web Store 安装",
-    step1Desc: "点击「添加到Chrome」— 无需账户，免费。BassWave图标会出现在工具栏中。",
-    step2Title: "打开任意有音频的标签",
-    step2Desc: "导航到YouTube、Spotify、Netflix或其他网站。开始播放。",
-    step3Title: "点击 BassWave 图标",
-    step3Desc: "按电源按钮。低音立即增强 — 根据喜好调整预设和增益。就这样。",
-    ctaTitle: "开始不同的聆听体验。",
-    ctaSub: "免费安装。无需账户。无追踪。"
-  },
-  ko: {
-    badge: "Chrome Web Store에서 이용 가능",
-    hero: "딥 베이스.<br><em>왜곡 제로.</em>",
-    sub: "BassWave는 Chrome 탭의 저음을 부스트합니다 — 음악, 동영상, 팟캐스트 — 고음량에서 harsh clipping을 제거하는 전문 오디오 체인 사용. ⚠️ 왜곡을 피하려면 시스템과 플레이어 볼륨을 조절하세요.",
-    cta: "Chrome에 추가 — 무료",
-    seeFeatures: "기능 보기",
-    featTitle: "음악을 느끼는 사람들을 위해.",
-    feat1Title: "전문 오디오 체인",
-    feat1Desc: "3단계 처리: lowshelf 베이스 부스트, 미묘한 highshelf 명확성, 젠틀 컴프레서 — 강력하고 깨끗한 베이스, 왜곡 없음.",
-    feat2Title: "깨끗한 피크, 클리핑 없음",
-    feat2Desc: "젠틀 컴프레서가 클리핑으로부터 보호, 펌핑이나 왜곡 없음. 높은 음량도 펀치y하고 깨끗.",
-    feat3Title: "어떤 탭이든, 원클릭",
-    feat3Desc: "YouTube, Spotify Web, SoundCloud, Netflix, Twitch에서 작동 — 오디오가 있는 Chrome 탭이면 무엇이든. 페이지 새로고침 불필요.",
-    feat4Title: "프리셋 + 수동 게인",
-    feat4Desc: "Soft, Medium, Strong 프리셋이 대부분의 상황을 커버. 0~+30dB 슬라이더를 드래그하여 원하는 위치에 정확히 설정.",
-    feat5Title: "키보드 단축키",
-    feat5Desc: "Ctrl+Shift+B로 팝업을 열지 않고 베이스 부스트 전환. 설정이 세션 간에 기억됩니다.",
-    feat6Title: "데이터 수집 제로",
-    feat6Desc: "BassWave는 브라우저 내에서 로컬로 오디오를 처리. 마이크 액세스 없음, 분석 없음, 무료 버전은 계정 불필요.",
-    howLabel: "작동 방식",
-    howTitle: "30초 만에 시작.",
-    step1Title: "Chrome Web Store에서 설치",
-    step1Desc: "「Chrome에 추가」클릭 — 계정 불필요, 무료. BassWave 아이콘이 도구 모음에 나타납니다.",
-    step2Title: "오디오가 있는 탭 열기",
-    step2Desc: "YouTube, Spotify, Netflix 또는 기타 사이트로 이동. 재생을 시작합니다.",
-    step3Title: "BassWave 아이콘 클릭",
-    step3Desc: "전원 버튼을 누릅니다. 베이스가 즉시 부스트 — 프리셋과 게인을 취향에 맞게 조정. 끝.",
-    ctaTitle: "다르게 듣기 시작.",
-    ctaSub: "무료. 계정 없음. 추적 없음."
-  }
-};
-
-function applyLang(lang) {
-  const t = TRANSLATIONS[lang] || TRANSLATIONS.en;
-  const set = (id, v) => { const el = document.getElementById(id); if (el) el.innerHTML = v; };
-  const setText = (id, v) => { const el = document.getElementById(id); if (el) el.textContent = v; };
-
-  setText("badgeText", t.badge);
-  set("heroTitle", t.hero);
-  setText("heroSub", t.sub);
-  setText("ctaBtn", t.cta);
-  setText("seeFeaturesBtn", t.seeFeatures);
-  set("featTitle", t.featTitle);
-  set("feat1Title", t.feat1Title); set("feat1Desc", t.feat1Desc);
-  set("feat2Title", t.feat2Title); set("feat2Desc", t.feat2Desc);
-  set("feat3Title", t.feat3Title); set("feat3Desc", t.feat3Desc);
-  set("feat4Title", t.feat4Title); set("feat4Desc", t.feat4Desc);
-  set("feat5Title", t.feat5Title); set("feat5Desc", t.feat5Desc);
-  set("feat6Title", t.feat6Title); set("feat6Desc", t.feat6Desc);
-  setText("howLabel", t.howLabel);
-  set("howTitle", t.howTitle);
-  setText("step1Title", t.step1Title); setText("step1Desc", t.step1Desc);
-  setText("step2Title", t.step2Title); setText("step2Desc", t.step2Desc);
-  setText("step3Title", t.step3Title); setText("step3Desc", t.step3Desc);
-  set("ctaTitle", t.ctaTitle);
-  setText("ctaSub", t.ctaSub);
-  setText("ctaBtn2", t.cta);
-
-  document.querySelectorAll(".lang-btn").forEach(b => b.classList.toggle("active", b.dataset.lang === lang));
-  localStorage.setItem("bwLang", lang);
-}
-
-document.addEventListener("DOMContentLoaded", () => {
-  const saved = localStorage.getItem("bwLang");
-  const browser = (navigator.language || "en").slice(0, 2);
-  const lang = saved || (TRANSLATIONS[browser] ? browser : "en");
-  applyLang(lang);
-  document.querySelectorAll(".lang-btn").forEach(b => {
-    b.addEventListener("click", () => applyLang(b.dataset.lang));
-  });
-});
-</script>
+  </footer>
 </body>
 </html>
